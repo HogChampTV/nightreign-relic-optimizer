@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react";
 import { parseSave, SaveParseError } from "../engine/save-parser.js";
 
-export default function ImportPanel({ onImported, onCancel, onClear }) {
+export default function ImportPanel({ onImported, onCancel, onClear, onDemo }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(null);
   const [dragging, setDragging] = useState(false);
@@ -54,6 +54,13 @@ export default function ImportPanel({ onImported, onCancel, onClear }) {
       </div>
 
       {error && <div className="error-box">{error}</div>}
+
+      {onDemo && (
+        <div className="demo-offer">
+          <span className="muted">No save handy? Look around first:</span>
+          <button className="ghost" onClick={onDemo}>Browse with demo data</button>
+        </div>
+      )}
 
       <div className="import-help">
         <h3>Where is my save file?</h3>

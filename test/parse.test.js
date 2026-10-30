@@ -231,6 +231,18 @@ test("checklist share links round-trip", async () => {
   assert.equal(decoded.r[0].l[0], 26, "locations are 1-based");
   assert.ok(decoded.r[0].e[1].startsWith("✦"), "curses are marked");
   assert.equal(decodeChecklist("not-base64!!"), null, "garbage decodes to null, not a crash");
+
+  // Pre-compression links (plain base64 JSON) must keep working.
+  const legacy = Buffer.from(JSON.stringify(payload), "utf8")
+    .toString("base64")
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=+$/, "");
+  assert.deepEqual(decodeChecklist(legacy), payload, "legacy uncompressed links still decode");
+  assert.ok(
+    encodeChecklist(payload).length < legacy.length,
+    "compressed links are shorter than legacy ones",
+  );
 });
 
 test("curse tiers cover every debuff effect, and only debuffs", () => {

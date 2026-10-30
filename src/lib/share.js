@@ -2,21 +2,36 @@
 // equip locations) is packed into the URL hash, so the link works on any
 // device — e.g. a phone next to the PC — with no save import and no server.
 
+import { deflateSync, inflateSync } from "fflate";
+
 const b64url = (s) => s.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 const b64std = (s) => s.replace(/-/g, "+").replace(/_/g, "/");
 
-export function encodeChecklist(data) {
-  const bytes = new TextEncoder().encode(JSON.stringify(data));
+const toB64 = (bytes) => {
   let bin = "";
   for (const b of bytes) bin += String.fromCharCode(b);
   return b64url(btoa(bin));
+};
+const fromB64 = (encoded) => Uint8Array.from(atob(b64std(encoded)), (c) => c.charCodeAt(0));
+
+// Deflate before base64: the payload is repetitive text, so this roughly
+// halves the link — which drops the QR code several versions and makes it
+// far easier for a phone camera to lock onto.
+export function encodeChecklist(data) {
+  return toB64(deflateSync(new TextEncoder().encode(JSON.stringify(data))));
 }
 
 export function decodeChecklist(encoded) {
   try {
-    const bin = atob(b64std(encoded));
-    const bytes = Uint8Array.from(bin, (c) => c.charCodeAt(0));
-    const data = JSON.parse(new TextDecoder().decode(bytes));
+    const bytes = fromB64(encoded);
+    let json;
+    try {
+      json = new TextDecoder().decode(inflateSync(bytes));
+    } catch {
+      // Older links were plain base64 JSON; keep them working.
+      json = new TextDecoder().decode(bytes);
+    }
+    const data = JSON.parse(json);
     if (!Array.isArray(data?.r)) return null;
     return data;
   } catch {

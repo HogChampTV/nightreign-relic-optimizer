@@ -325,14 +325,30 @@ label { display: flex; flex-direction: column; gap: 4px; font-size: 13px; color:
 .combo-head { flex-wrap: wrap; }
 .share-pop {
   position: absolute; right: 0; top: calc(100% + 6px); z-index: 40;
-  display: flex; flex-direction: column; gap: 8px; width: 220px;
+  display: flex; flex-direction: column; gap: 8px; width: max-content; max-width: min(360px, 90vw);
   background: var(--bg-card); border: 1px solid var(--gold); border-radius: 10px;
   padding: 12px; font-size: 12px; box-shadow: 0 8px 28px rgba(0,0,0,0.6);
 }
-.share-pop img { border-radius: 6px; align-self: center; }
+.share-pop img { border-radius: 6px; align-self: center; max-width: 100%; image-rendering: pixelated; }
+@media (max-width: 640px) {
+  .share-pop { position: fixed; left: 50%; right: auto; top: 50%; transform: translate(-50%, -50%); }
+}
+.share-pop .muted, .share-pop .share-actions { max-width: 320px; }
 .share-actions { display: flex; gap: 8px; }
 .share-actions .open-link { text-decoration: none; padding: 4px 9px; border: 1px solid var(--border-light); border-radius: 6px; color: var(--text-dim); }
 .share-actions .open-link:hover { color: var(--text); }
+
+/* ---- Demo browsing ---- */
+.demo-offer {
+  display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap;
+  margin-top: 14px; font-size: 13px;
+}
+.demo-banner {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+  margin: 12px 0 0; padding: 9px 14px; font-size: 13px;
+  background: rgba(195, 168, 96, 0.08); border: 1px solid var(--gold);
+  border-radius: 10px; color: var(--text);
+}
 
 /* ---- Standalone equip checklist (phone-first) ---- */
 .checklist-page { max-width: 640px; margin: 0 auto; padding: 0 16px; }

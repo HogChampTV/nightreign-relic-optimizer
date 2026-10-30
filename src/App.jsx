@@ -19,6 +19,7 @@ const gd = createGameData(gameDataJson);
 
 export default function App() {
   const [save, setSave] = useState(() => loadSave());
+  const [demoSave, setDemoSave] = useState(null);
   const [prevSave, setPrevSave] = useState(() => loadPrevSave());
   const [prefs, setPrefs] = useState(() => loadPrefs());
   const [tab, setTab] = useState("builds");
@@ -33,9 +34,13 @@ export default function App() {
     });
   };
 
+  // A real import always wins over demo data; demo is only a stand-in.
+  const activeSave = save ?? demoSave;
+  const isDemo = !save && !!demoSave;
+
   const characters = useMemo(
-    () => (save?.slots ?? []).map((slot) => buildCharacter(slot, gd)).filter((c) => c.relics.length > 0),
-    [save],
+    () => (activeSave?.slots ?? []).map((slot) => buildCharacter(slot, gd)).filter((c) => c.relics.length > 0),
+    [activeSave],
   );
 
   const slotIndex = characters.some((c) => c.index === prefs.slotIndex)
@@ -65,7 +70,20 @@ export default function App() {
     }
     setSave(parsed);
     persistSave(parsed);
+    setDemoSave(null);
     setShowImport(false);
+  };
+
+  // Demo browsing: a sample relic collection (synthetic test data, not a real
+  // player's save) so every tab can be explored before importing. Not persisted.
+  const startDemo = async () => {
+    try {
+      const res = await fetch(`${import.meta.env.BASE_URL}demo-save.json`);
+      setDemoSave(await res.json());
+      setShowImport(false);
+    } catch {
+      /* stay on the import screen */
+    }
   };
 
   const onClear = () => {
@@ -110,7 +128,9 @@ export default function App() {
                   ))}
                 </select>
               </label>
-              <button className="ghost" onClick={() => setShowImport(true)}>Re-import save</button>
+              <button className="ghost" onClick={() => setShowImport(true)}>
+                {isDemo ? "Import your save" : "Re-import save"}
+              </button>
               <button className="ghost help-btn" title="Show the guided tour" onClick={() => setShowTutorial(true)}>
                 ? Help
               </button>
@@ -119,10 +139,24 @@ export default function App() {
         </div>
       </header>
 
-      {!save || showImport || !character ? (
-        <ImportPanel onImported={onImported} onCancel={save && character ? () => setShowImport(false) : undefined} onClear={save ? onClear : undefined} />
+      {showImport || !character ? (
+        <ImportPanel
+          onImported={onImported}
+          onCancel={character ? () => setShowImport(false) : undefined}
+          onClear={save ? onClear : undefined}
+          onDemo={!activeSave ? startDemo : undefined}
+        />
       ) : (
         <>
+          {isDemo && (
+            <div className="demo-banner">
+              <span>
+                <strong>Demo data</strong> — a sample relic collection, not yours. Every tab works; import your own
+                save to see your relics.
+              </span>
+              <button className="ghost small" onClick={() => setShowImport(true)}>Import your save</button>
+            </div>
+          )}
           <nav className="tabs">
             <button className={tab === "builds" ? "active" : ""} onClick={() => setTab("builds")}>Build Optimizer</button>
             <button className={tab === "relics" ? "active" : ""} onClick={() => setTab("relics")}>

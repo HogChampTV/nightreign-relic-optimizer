@@ -6,6 +6,8 @@ view of every relic you own, and finds the best vessel + relic loadouts for **De
 
 - **Import**: drag your `NR0000.sl2` onto the page. It is decrypted and parsed entirely in the
   browser (Web Crypto AES-CBC) — nothing is uploaded, and the save is only ever read.
+- **Demo mode**: no save handy? "Browse with demo data" on the import screen loads a sample
+  collection of ~1,300 relics so every tab can be explored before importing anything.
 - **Relic Browser**: search by relic or effect name, filter by color and normal/deep, and flag
   duplicate or outclassed relics you can safely sell.
 - **Build presets**: a researched **signature build for each of the ten Nightfarers** (shown

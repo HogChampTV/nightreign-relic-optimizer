@@ -33,7 +33,15 @@ export default function ShareChecklist({ vesselName, score, isDeep, relics }) {
 
   useEffect(() => {
     if (!open || !link) return;
-    QRCode.toDataURL(link, { margin: 1, width: 180, color: { dark: "#0a0d14", light: "#e9d490" } })
+    // Plain black-on-white with a real quiet zone: themed/tinted QR codes scan
+    // poorly. An integer scale keeps every module pixel-crisp, and low error
+    // correction keeps the dense (long-link) code as sparse as possible.
+    QRCode.toDataURL(link, {
+      margin: 2,
+      scale: 3,
+      errorCorrectionLevel: "L",
+      color: { dark: "#000000", light: "#ffffff" },
+    })
       .then(setQr)
       .catch(() => setQr(""));
   }, [open, link]);
@@ -45,7 +53,7 @@ export default function ShareChecklist({ vesselName, score, isDeep, relics }) {
       </button>
       {open && (
         <span className="share-pop">
-          {qr && <img src={qr} alt="QR code for this checklist" width="180" height="180" />}
+          {qr && <img src={qr} alt="QR code for this checklist" className="share-qr" />}
           <span className="muted">
             {copied ? "Link copied — " : ""}scan to open this loadout as a tap-off checklist on your phone. The
             whole build is inside the link; nothing is uploaded.
