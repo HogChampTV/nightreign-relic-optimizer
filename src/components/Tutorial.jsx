@@ -35,6 +35,10 @@ const STEPS = [
           weakness element, the right negation and resistances) are layered on automatically. Then hit{" "}
           <strong>Find best loadouts</strong> to search every vessel + relic combination.
         </p>
+        <p>
+          Like a build? <strong>🔗 Share build</strong> turns its goals into a link/QR a friend can open — it
+          runs against <em>their</em> relics.
+        </p>
       </>
     ),
   },
@@ -66,6 +70,10 @@ const STEPS = [
           Filter by color or Deep.
         </p>
         <p>Hover any effect for a tooltip with notes, including whether copies of it stack.</p>
+        <p>
+          Hunting something specific? Open the <strong>Wishlist</strong> and star the effects you're farming —
+          matches glow on every card, and What's New flags fresh imports that contain one.
+        </p>
       </>
     ),
   },
@@ -108,9 +116,9 @@ const STEPS = [
     body: (
       <>
         <p>
-          Mid-expedition reference: the full <strong>Nightlord weakness table</strong> (damage modifiers and
-          status thresholds — click a boss to target it in the optimizer) and a{" "}
-          <strong>Sorcerer's Rise unlock route</strong> with every known seal spot, tickable as you sweep them.
+          Mid-expedition reference: the full <strong>Nightlord weakness table</strong> (click a boss to target
+          it in the optimizer), every <strong>Shifting Earth</strong> event's reward and route, a tickable{" "}
+          <strong>Sorcerer's Rise unlock route</strong>, and all Deep relic <strong>curses ranked by tier</strong>.
         </p>
       </>
     ),

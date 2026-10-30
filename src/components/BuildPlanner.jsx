@@ -4,6 +4,8 @@ import { searchCombos, SearchCancelled } from "../lib/combo-client.js";
 import { PRESETS, PRIORITY_WEIGHTS, CURSE_PENALTIES } from "../lib/presets.js";
 import { resolvePreset } from "../lib/preset-engine.js";
 import { loadCustomBuilds, persistCustomBuilds } from "../lib/store.js";
+import { buildSharePayload, encodeBuild } from "../lib/share.js";
+import SharePopover from "./SharePopover.jsx";
 import EffectPicker from "./EffectPicker.jsx";
 import Results from "./Results.jsx";
 import GapReport from "./GapReport.jsx";
@@ -12,7 +14,7 @@ import { RUN_KILLER_SLUGS } from "../lib/curse-tiers.js";
 import { COLOR_NAMES } from "../engine/game-data.js";
 import { NIGHTLORDS, nightlordById } from "../lib/nightlords.js";
 
-export default function BuildPlanner({ gd, relics, deepRelics, prefs, setPref }) {
+export default function BuildPlanner({ gd, relics, deepRelics, prefs, setPref, sharedBuild, onSharedBuildApplied }) {
   const nightfarer = prefs.nightfarer ?? 0;
   const mode = prefs.mode ?? "deep";
   const targetNightlordId = prefs.nightlord ?? "";
@@ -28,6 +30,7 @@ export default function BuildPlanner({ gd, relics, deepRelics, prefs, setPref })
   const [error, setError] = useState(null);
   const [customBuilds, setCustomBuilds] = useState(() => loadCustomBuilds());
   const [buildName, setBuildName] = useState("");
+  const [importedNote, setImportedNote] = useState(null);
 
   const nf = gd.nightfarers[nightfarer];
   const allVessels = useMemo(() => {
@@ -134,6 +137,7 @@ export default function BuildPlanner({ gd, relics, deepRelics, prefs, setPref })
       }));
       setActivePresetId(preset.id);
       setReport(report);
+      setImportedNote(null);
       setGoals(rows);
       setCursePenalty(preset.cursePenalty);
       setResults(null);
@@ -148,6 +152,37 @@ export default function BuildPlanner({ gd, relics, deepRelics, prefs, setPref })
     if (preset) applyPreset(preset);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode, nightfarer, relics, deepRelics]);
+
+  // Apply a shared #b= link once: goals travel as slugs and resolve against
+  // this player's own game data (unknown slugs are dropped, not crashed on).
+  useEffect(() => {
+    if (!sharedBuild) return;
+    const bySlug = (slug) => gd.effectsByKey.find((e) => e?.slug === slug);
+    const rows = sharedBuild.g
+      .map((g) => {
+        const e = bySlug(g.s);
+        if (!e) return null;
+        return {
+          effectKey: e.key,
+          min: Math.max(0, Number(g.min) || 0),
+          max: Math.max(0, Number(g.max ?? 10) || 0),
+          priority: ["high", "normal", "low"].includes(g.p) ? g.p : "normal",
+        };
+      })
+      .filter(Boolean);
+    if (typeof sharedBuild.f === "number" && gd.nightfarers[sharedBuild.f]) setPref("nightfarer", sharedBuild.f);
+    setPref("mode", sharedBuild.m === "normal" ? "normal" : "deep");
+    if (sharedBuild.nl) setPref("nightlord", sharedBuild.nl);
+    setCursePenalty(["none", "mild", "strong"].includes(sharedBuild.c) ? sharedBuild.c : "mild");
+    setGoals(rows);
+    setActivePresetId(null);
+    setReport(null);
+    setResults(null);
+    const dropped = sharedBuild.g.length - rows.length;
+    setImportedNote({ name: sharedBuild.n || "Shared build", count: rows.length, dropped });
+    onSharedBuildApplied?.();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sharedBuild]);
 
   // Changing the target Nightlord re-ranks existing results with its counter goals.
   useEffect(() => {
@@ -188,6 +223,7 @@ export default function BuildPlanner({ gd, relics, deepRelics, prefs, setPref })
     setPref("nightfarer", build.nightfarer);
     setPref("mode", build.mode);
     setCursePenalty(build.cursePenalty);
+    setImportedNote(null);
     setGoals(build.goals);
     setActivePresetId(null);
     setReport(null);
@@ -378,6 +414,13 @@ export default function BuildPlanner({ gd, relics, deepRelics, prefs, setPref })
           Build goals
           {activePresetId && <span className="muted"> — from preset “{PRESETS.find((p) => p.id === activePresetId)?.name}” (editing makes it custom)</span>}
         </h2>
+        {importedNote && (
+          <p className="imported-note">
+            ⇩ Loaded shared build <strong>“{importedNote.name}”</strong> ({importedNote.count} goals
+            {importedNote.dropped > 0 ? `, ${importedNote.dropped} unknown effect${importedNote.dropped > 1 ? "s" : ""} skipped` : ""}
+            ) — hit <strong>Find best loadouts</strong> to run it against your relics.
+          </p>
+        )}
         {goals.length === 0 && <p className="muted">Pick a preset above or add effects below to start.</p>}
         {goals.map((g, i) => {
           const effect = gd.effectByKey(g.effectKey);
@@ -427,6 +470,27 @@ export default function BuildPlanner({ gd, relics, deepRelics, prefs, setPref })
             onChange={(e) => setBuildName(e.target.value)}
           />
           <button className="ghost" disabled={goals.length === 0} onClick={saveCustom}>Save as custom build</button>
+          {goals.length > 0 && (
+            <SharePopover
+              buttonLabel="🔗 Share build"
+              note="send this to a friend — it opens the Build Optimizer with these goals and runs against their relics. Nothing is uploaded."
+              makeLink={() => {
+                const payload = buildSharePayload({
+                  name:
+                    buildName.trim() ||
+                    PRESETS.find((p) => p.id === activePresetId)?.name ||
+                    `${nf.name} build`,
+                  nightfarer,
+                  mode,
+                  cursePenalty,
+                  nightlordId: targetNightlordId,
+                  goals,
+                  gd,
+                });
+                return `${window.location.origin}${window.location.pathname}#b=${encodeBuild(payload)}`;
+              }}
+            />
+          )}
         </div>
         {error && <div className="error-box">{error}</div>}
       </section>

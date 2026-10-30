@@ -7,6 +7,7 @@ const PREV_SAVE_KEY = "nro.save.prev.v1";
 const PREFS_KEY = "nro.prefs.v1";
 const BUILDS_KEY = "nro.customBuilds.v1";
 const TUTORIAL_KEY = "nro.tutorialSeen.v1";
+const WISHLIST_KEY = "nro.wishlist.v1";
 
 const read = (key) => {
   try {
@@ -43,3 +44,7 @@ export const persistCustomBuilds = (builds) => write(BUILDS_KEY, builds);
 
 export const loadTutorialSeen = () => read(TUTORIAL_KEY) === true;
 export const persistTutorialSeen = () => write(TUTORIAL_KEY, true);
+
+// Farming wishlist: effect slugs the player is hunting for.
+export const loadWishlist = () => read(WISHLIST_KEY) ?? [];
+export const persistWishlist = (slugs) => write(WISHLIST_KEY, slugs);

@@ -17,26 +17,29 @@ const fromB64 = (encoded) => Uint8Array.from(atob(b64std(encoded)), (c) => c.cha
 // Deflate before base64: the payload is repetitive text, so this roughly
 // halves the link — which drops the QR code several versions and makes it
 // far easier for a phone camera to lock onto.
-export function encodeChecklist(data) {
-  return toB64(deflateSync(new TextEncoder().encode(JSON.stringify(data))));
-}
+const encodeShare = (data) => toB64(deflateSync(new TextEncoder().encode(JSON.stringify(data))));
 
-export function decodeChecklist(encoded) {
+const decodeShare = (encoded) => {
   try {
     const bytes = fromB64(encoded);
-    let json;
     try {
-      json = new TextDecoder().decode(inflateSync(bytes));
+      return JSON.parse(new TextDecoder().decode(inflateSync(bytes)));
     } catch {
       // Older links were plain base64 JSON; keep them working.
-      json = new TextDecoder().decode(bytes);
+      return JSON.parse(new TextDecoder().decode(bytes));
     }
-    const data = JSON.parse(json);
-    if (!Array.isArray(data?.r)) return null;
-    return data;
   } catch {
     return null;
   }
+};
+
+export function encodeChecklist(data) {
+  return encodeShare(data);
+}
+
+export function decodeChecklist(encoded) {
+  const data = decodeShare(encoded);
+  return Array.isArray(data?.r) ? data : null;
 }
 
 /** Stable short id for a checklist payload, for per-list checkbox storage. */
@@ -51,6 +54,42 @@ export function checklistFromHash() {
   if (!m) return null;
   const data = decodeChecklist(m[1]);
   return data ? { data, id: checklistId(m[1]) } : null;
+}
+
+// ---- Shared builds (#b= links) ----
+// Goals travel as effect slugs (stable across game-data updates), so a friend's
+// app resolves them against its own tables.
+
+/** Build the payload for the current goal editor state. */
+export function buildSharePayload({ name, nightfarer, mode, cursePenalty, nightlordId, goals, gd }) {
+  return {
+    t: "build",
+    n: name,
+    f: nightfarer,
+    m: mode,
+    c: cursePenalty,
+    nl: nightlordId || undefined,
+    g: goals
+      .map((g) => {
+        const e = gd.effectByKey(g.effectKey);
+        return e?.slug ? { s: e.slug, min: g.min, max: g.max, p: g.priority } : null;
+      })
+      .filter(Boolean),
+  };
+}
+
+export function encodeBuild(payload) {
+  return encodeShare(payload);
+}
+
+export function decodeBuild(encoded) {
+  const data = decodeShare(encoded);
+  return data?.t === "build" && Array.isArray(data.g) ? data : null;
+}
+
+export function buildFromHash() {
+  const m = window.location.hash.match(/^#b=([A-Za-z0-9_-]+)/);
+  return m ? decodeBuild(m[1]) : null;
 }
 
 /** Build the payload for one optimizer result. */

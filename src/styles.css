@@ -350,6 +350,59 @@ label { display: flex; flex-direction: column; gap: 4px; font-size: 13px; color:
   border-radius: 10px; color: var(--text);
 }
 
+/* ---- Wishlist ---- */
+.wishlist-panel {
+  margin-top: 10px; padding: 12px; background: var(--bg-card);
+  border: 1px solid var(--border); border-radius: 10px;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.wishlist-chip.on, .wishlist-item { border-color: var(--gold); color: var(--gold-bright); }
+.wishlist-item { display: inline-flex; align-items: center; gap: 6px; }
+.chip-x {
+  background: none; border: none; color: var(--text-dim); cursor: pointer;
+  font-size: 11px; padding: 0 2px;
+}
+.chip-x:hover { color: var(--text); }
+.wishlist-badge { background: rgba(195, 168, 96, 0.15); color: var(--gold-bright); }
+.wishlist-banner { border-color: var(--gold); }
+
+/* ---- Shared builds ---- */
+.imported-note {
+  padding: 9px 14px; font-size: 13px; border: 1px solid var(--gold);
+  border-radius: 10px; background: rgba(195, 168, 96, 0.08);
+}
+
+/* ---- Guides: Shifting Earth ---- */
+.guide-toc { margin: 12px 0 2px; }
+.se-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; }
+.se-card {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px;
+  padding: 14px; font-size: 13px; display: flex; flex-direction: column; gap: 6px;
+}
+.se-card p, .se-card ul { margin: 0; }
+.se-head { font-size: 14px; }
+.se-tips { padding-left: 18px; color: var(--text-dim); }
+.se-tips li { margin: 3px 0; }
+.se-hazard { color: #d9a05b; font-size: 12px; }
+
+/* ---- Guides: curse tiers ---- */
+.curse-group { margin-top: 14px; }
+.curse-tier { margin: 0 0 8px; font-size: 14px; }
+.curse-tier.bad { color: #e06c6c; }
+.curse-tier.warn { color: #d9a05b; }
+.curse-tier.good { color: #7fc77f; }
+.curse-rows { display: flex; flex-direction: column; gap: 6px; }
+.curse-row {
+  display: grid; grid-template-columns: 240px 140px 1fr; gap: 10px; align-items: baseline;
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  padding: 8px 12px; font-size: 12.5px;
+}
+.curse-row .curse-value { font-size: 12px; }
+.curse-row .curse-note { color: var(--text-dim); }
+@media (max-width: 760px) {
+  .curse-row { grid-template-columns: 1fr; gap: 2px; }
+}
+
 /* ---- Standalone equip checklist (phone-first) ---- */
 .checklist-page { max-width: 640px; margin: 0 auto; padding: 0 16px; }
 .checklist-head h2 { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; color: var(--gold-bright); }

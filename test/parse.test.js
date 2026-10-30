@@ -245,6 +245,43 @@ test("checklist share links round-trip", async () => {
   );
 });
 
+test("build share links round-trip through slugs", async () => {
+  const { buildSharePayload, encodeBuild, decodeBuild } = await import("../src/lib/share.js");
+  const effects = gd.effectsByKey.filter((e) => e?.slug).slice(0, 3);
+  const goals = effects.map((e, i) => ({ effectKey: e.key, min: i, max: 10, priority: "high" }));
+  const payload = buildSharePayload({
+    name: "Test build",
+    nightfarer: 4,
+    mode: "deep",
+    cursePenalty: "strong",
+    nightlordId: "caligo",
+    goals,
+    gd,
+  });
+  const decoded = decodeBuild(encodeBuild(payload));
+  assert.equal(decoded.n, "Test build");
+  assert.equal(decoded.f, 4);
+  assert.equal(decoded.nl, "caligo");
+  assert.equal(decoded.g.length, 3, "all goals carried");
+  for (const [i, g] of decoded.g.entries()) {
+    const e = gd.effectsByKey.find((x) => x?.slug === g.s);
+    assert.ok(e, `slug ${g.s} resolves back to an effect`);
+    assert.equal(e.key, goals[i].effectKey);
+  }
+  assert.equal(decodeBuild(encodeBuild({ t: "nope" })), null, "non-build payloads rejected");
+});
+
+test("shifting earth guide entries are complete", async () => {
+  const { SHIFTING_EARTH } = await import("../src/lib/guides-data.js");
+  assert.equal(SHIFTING_EARTH.length, 4, "all four events");
+  for (const se of SHIFTING_EARTH) {
+    for (const field of ["name", "where", "terrain", "boss", "reward", "hazard"]) {
+      assert.ok(typeof se[field] === "string" && se[field].length > 5, `${se.name ?? "?"} has ${field}`);
+    }
+    assert.ok(Array.isArray(se.tips) && se.tips.length >= 2, `${se.name} has tips`);
+  }
+});
+
 test("curse tiers cover every debuff effect, and only debuffs", () => {
   const debuffs = gd.effectsByKey.filter((e) => e?.type === 1);
   const tiered = new Set(Object.keys(CURSE_TIERS));

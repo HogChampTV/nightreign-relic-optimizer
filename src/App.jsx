@@ -4,8 +4,9 @@ import { createGameData } from "./engine/game-data.js";
 import { buildCharacter } from "./engine/model.js";
 import {
   loadSave, persistSave, clearSave, loadPrefs, persistPrefs, loadPrevSave, persistPrevSave,
-  loadTutorialSeen, persistTutorialSeen,
+  loadTutorialSeen, persistTutorialSeen, loadWishlist, persistWishlist,
 } from "./lib/store.js";
+import { buildFromHash } from "./lib/share.js";
 import Tutorial from "./components/Tutorial.jsx";
 import ImportPanel from "./components/ImportPanel.jsx";
 import RelicBrowser from "./components/RelicBrowser.jsx";
@@ -25,6 +26,19 @@ export default function App() {
   const [tab, setTab] = useState("builds");
   const [showImport, setShowImport] = useState(false);
   const [showTutorial, setShowTutorial] = useState(false);
+  const [wishlist, setWishlistState] = useState(() => loadWishlist());
+  // A #b= link carries a friend's build goals; held until the planner mounts
+  // (after an import or demo load) and cleared from the URL right away.
+  const [sharedBuild, setSharedBuild] = useState(() => {
+    const b = buildFromHash();
+    if (b) history.replaceState(null, "", window.location.pathname + window.location.search);
+    return b;
+  });
+
+  const setWishlist = (slugs) => {
+    setWishlistState(slugs);
+    persistWishlist(slugs);
+  };
 
   const setPref = (k, v) => {
     setPrefs((p) => {
@@ -145,6 +159,7 @@ export default function App() {
           onCancel={character ? () => setShowImport(false) : undefined}
           onClear={save ? onClear : undefined}
           onDemo={!activeSave ? startDemo : undefined}
+          pendingBuild={sharedBuild ? (sharedBuild.n ?? "") : undefined}
         />
       ) : (
         <>
@@ -173,20 +188,29 @@ export default function App() {
             </button>
           </nav>
           {tab === "relics" ? (
-            <RelicBrowser character={character} />
+            <RelicBrowser character={character} gd={gd} wishlist={wishlist} setWishlist={setWishlist} />
           ) : tab === "sell" ? (
             <SellAudit gd={gd} character={character} />
           ) : tab === "new" ? (
-            <WhatsNew character={character} prevCharacter={prevCharacter} />
+            <WhatsNew character={character} prevCharacter={prevCharacter} wishlist={wishlist} />
           ) : tab === "guides" ? (
             <Guides
+              gd={gd}
               onTargetNightlord={(id) => {
                 setPref("nightlord", id);
                 setTab("builds");
               }}
             />
           ) : (
-            <BuildPlanner gd={gd} relics={relics} deepRelics={deepRelics} prefs={prefs} setPref={setPref} />
+            <BuildPlanner
+              gd={gd}
+              relics={relics}
+              deepRelics={deepRelics}
+              prefs={prefs}
+              setPref={setPref}
+              sharedBuild={sharedBuild}
+              onSharedBuildApplied={() => setSharedBuild(null)}
+            />
           )}
           <Tutorial open={showTutorial} onClose={closeTutorial} setTab={setTab} />
         </>

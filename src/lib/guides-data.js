@@ -61,3 +61,62 @@ export const RISE_GUIDE = {
   ],
   credit: "Route distilled from community guides (seal-spot pool is fixed; which spots roll varies per expedition).",
 };
+
+// Shifting Earth events: what each map takeover gives you and whether it's
+// worth the detour. Researched from the wiki.gg Nightreign Shifting Earth page
+// and Game8's per-event guides (cross-checked; Fextralife for names/affinities).
+export const SHIFTING_EARTH = [
+  {
+    name: "The Crater",
+    where: "North-central Limveld",
+    terrain: "Volcanic crater with a lava pit; the route descends to a smithing altar at the bottom.",
+    boss: "Fire Prelates (mandatory trio mid-descent), then a Magma Wyrm at the altar",
+    reward:
+      "Special Smithing Table: upgrade ONE weapon per run to Legendary rarity — whatever its current rarity — with its level requirement removed.",
+    tips: [
+      "Go day 2 after leveling; rush the bosses and skip the trash (and the Flaming Hand enemies).",
+      "The Spectral Hawk exit also works as an escape before the Magma Wyrm — but leaving before using the table forfeits the upgrade.",
+      "A church always spawns just west of the crater; optional bosses include a Falling-Star Beast and Valiant Gargoyle.",
+    ],
+    hazard: "Lava and heavy fire damage — fire-negation relics help.",
+  },
+  {
+    name: "The Mountaintop",
+    where: "Northern Limveld",
+    terrain: "Snowy peaks linked by giant chain bridges, topped by a huge blue crystal.",
+    boss: "No mandatory boss — the Mountaintop Ice Dragon is the signature (optional) threat",
+    reward:
+      "“Favor of the Mountaintop” at the summit crystal: halves frostbite damage and buildup speed, and nearby frostbite boosts your attack power.",
+    tips: [
+      "The reward is a pure climb with no required boss — viable on day 1; save the dragons for day 2.",
+      "Ride the Spiritstreams up (east path crosses one chain bridge, west crosses two) and grab the Favor before engaging the Ice Dragon.",
+    ],
+    hazard: "Constant frostbite buildup on the way up; the Ice Dragon hits very hard.",
+  },
+  {
+    name: "Rotted Woods",
+    where: "South-eastern Limveld",
+    terrain: "Scarlet-rot forest; a fort sits in the far corner and a giant rot tree spawns at a random spot.",
+    boss: "No mandatory boss — random field bosses (Tree Sentinel, Erdtree Avatar, Black Blade Kindred…)",
+    reward:
+      "“Favor of the Rotted Woods” at the rot tree: scarlet rot is nullified, max HP rises, and attacking after taking damage restores HP — the rot zone becomes a buff. Every party member must grab it individually.",
+    tips: [
+      "The treasure map on the fort's top floor marks the tree on your map (one member reading it is enough — it just speeds up the find).",
+      "Grab the Favor first, then fight field bosses; day 1 is fine if you skip the bosses.",
+    ],
+    hazard: "Passive rot buildup everywhere until you have the Favor; Sacramental Buds cure it.",
+  },
+  {
+    name: "Noklateo, the Shrouded City",
+    where: "South-western Limveld",
+    terrain: "A walled Eternal City with a single entrance on its north-east side; a grand hall sits at the far end.",
+    boss: "Naturalborn of the Void (mandatory, before the grand hall); optional Dragonkin Soldier and Black Knife Assassins",
+    reward:
+      "“Favor of Noklateo”: one self-revive per Nightfarer, plus a temporary power boost after reviving. There's also a mid-city altar that duplicates a weapon — copy your best one for a teammate.",
+    tips: [
+      "A merchant waits just right of the entrance, and a Site of Grace sits before the hall steps — recommended day 2.",
+      "Required for Wylder's Remembrance.",
+    ],
+    hazard: "Basilisk black smoke in the waterways causes Death Blight; the Naturalborn's laser and AoEs hit hard.",
+  },
+];

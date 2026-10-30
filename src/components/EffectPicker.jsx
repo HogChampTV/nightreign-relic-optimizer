@@ -7,7 +7,8 @@ import obtainable from "../data/obtainable-effects.json";
 // The game-data tables also hold datamined effects that never roll — hide those.
 const OBTAINABLE = new Set(obtainable.keys);
 
-export default function EffectPicker({ gd, nightfarer, excludeKeys, onPick, inventoryKeys }) {
+// nightfarer "any" keeps character-specific effects in the list (wishlist use).
+export default function EffectPicker({ gd, nightfarer, excludeKeys, onPick, inventoryKeys, placeholder }) {
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
   const boxRef = useRef(null);
@@ -23,7 +24,7 @@ export default function EffectPicker({ gd, nightfarer, excludeKeys, onPick, inve
           e &&
           !e.mmv &&
           !e.unknown &&
-          (e.nightfarer === undefined || e.nightfarer === nightfarer) &&
+          (nightfarer === "any" || e.nightfarer === undefined || e.nightfarer === nightfarer) &&
           (OBTAINABLE.has(e.key) || inventoryKeys?.has(e.key)) &&
           !excludeKeys.has(e.key) &&
           matches(e.name.toLowerCase()),
@@ -37,7 +38,7 @@ export default function EffectPicker({ gd, nightfarer, excludeKeys, onPick, inve
   return (
     <div className="effect-picker" ref={boxRef}>
       <input
-        placeholder="Add an effect goal (type to search, e.g. “damage negation”)…"
+        placeholder={placeholder ?? "Add an effect goal (type to search, e.g. “damage negation”)…"}
         value={query}
         onChange={(e) => { setQuery(e.target.value); setOpen(true); }}
         onFocus={() => setOpen(true)}

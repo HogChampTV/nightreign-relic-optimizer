@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react";
 import { parseSave, SaveParseError } from "../engine/save-parser.js";
 
-export default function ImportPanel({ onImported, onCancel, onClear, onDemo }) {
+export default function ImportPanel({ onImported, onCancel, onClear, onDemo, pendingBuild }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(null);
   const [dragging, setDragging] = useState(false);
@@ -54,6 +54,15 @@ export default function ImportPanel({ onImported, onCancel, onClear, onDemo }) {
       </div>
 
       {error && <div className="error-box">{error}</div>}
+
+      {pendingBuild !== undefined && (
+        <div className="demo-offer">
+          <span className="muted">
+            You opened a shared build{pendingBuild ? ` (“${pendingBuild}”)` : ""} — import your save
+            (or browse the demo) and it will load in the Build Optimizer.
+          </span>
+        </div>
+      )}
 
       {onDemo && (
         <div className="demo-offer">

@@ -26,8 +26,10 @@ function presetMatches(relic, nightfarer) {
   return hits;
 }
 
-export default function WhatsNew({ character, prevCharacter }) {
+export default function WhatsNew({ character, prevCharacter, wishlist = [] }) {
   const [nfFilter, setNfFilter] = useState(null);
+  const wlSlugs = useMemo(() => new Set(wishlist), [wishlist]);
+  const onWishlist = (r) => r.effects.flat().some((e) => wlSlugs.has(e.slug));
 
   const diff = useMemo(() => {
     if (!prevCharacter) return null;
@@ -62,6 +64,7 @@ export default function WhatsNew({ character, prevCharacter }) {
   }
 
   const { added, removedCount, outclassesBy } = diff;
+  const wishlistHits = wlSlugs.size > 0 ? added.filter(onWishlist) : [];
   const shownAdded = added.filter((r) => {
     if (nfFilter === null) return true;
     return presetMatches(r, nfFilter).length > 0;
@@ -88,6 +91,16 @@ export default function WhatsNew({ character, prevCharacter }) {
         </div>
       </div>
 
+      {wishlistHits.length > 0 && (
+        <div className="demo-banner wishlist-banner">
+          <span>
+            ★ <strong>{wishlistHits.length}</strong> new relic{wishlistHits.length > 1 ? "s" : ""} match
+            your wishlist — don't sell {wishlistHits.length > 1 ? "these" : "this one"} without a look:{" "}
+            {wishlistHits.slice(0, 3).map((r) => r.name).join(", ")}
+            {wishlistHits.length > 3 ? ` +${wishlistHits.length - 3} more` : ""}.
+          </span>
+        </div>
+      )}
       {added.length === 0 && <p className="muted">Nothing new in this import.</p>}
       {added.length > 0 && shownAdded.length === 0 && (
         <p className="muted">None of the new relics feed a {NF_NAMES[nfFilter]} preset.</p>
@@ -101,6 +114,12 @@ export default function WhatsNew({ character, prevCharacter }) {
             <div key={r.uid} className="sell-item">
               <RelicCard relic={r} />
               <div className="sell-reason">
+                {onWishlist(r) && (
+                  <div>
+                    <span className="badge wishlist-badge">★ Wishlist</span> carries an effect you're
+                    farming for.
+                  </div>
+                )}
                 {upgrades > 0 && (
                   <div>
                     <span className="badge ok-badge">Upgrade</span> outclasses {upgrades} relic
