@@ -11,7 +11,7 @@ const TAP_SLOP_PX = 8;
 
 const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
 
-export default function GreatHollowMap({ map, marked, onToggleCrystal }) {
+export default function GreatHollowMap({ map, marked, onToggleCrystal, focus }) {
   const viewRef = useRef(null);
   const [view, setView] = useState({ scale: 1, tx: 0, ty: 0 });
   const [layers, setLayers] = useState({ crystals: true, pois: false, spawns: true, labels: true });
@@ -41,6 +41,20 @@ export default function GreatHollowMap({ map, marked, onToggleCrystal }) {
     },
     [clampView],
   );
+
+  // "Show on map" from the crystal gallery: zoom in on the spot and select it.
+  useEffect(() => {
+    if (!focus) return;
+    const el = viewRef.current;
+    if (!el) return;
+    const size = el.clientWidth;
+    const scale = 3;
+    const px = (focus.spot.x / map.size) * size;
+    const py = (focus.spot.y / map.size) * size;
+    setView(clampView({ scale, tx: size / 2 - scale * px, ty: size / 2 - scale * py }));
+    setSelected(focus.spot);
+    setLayers((l) => (l.crystals ? l : { ...l, crystals: true }));
+  }, [focus, clampView, map.size]);
 
   const onWheel = useCallback(
     (e) => {
@@ -232,6 +246,70 @@ export default function GreatHollowMap({ map, marked, onToggleCrystal }) {
         )}
       </div>
       <p className="preset-research ghm-credit">{map.credit}</p>
+    </div>
+  );
+}
+
+// Close-up card per crystal spot: a CSS crop of the same map image centered
+// on the spot (no extra assets), its location note, and mark/show actions.
+const THUMB_WINDOW = 220; // map units visible across a thumbnail
+
+const THUMB_ASPECT = 2; // thumbs are 2:1 (matches .ghc-thumb aspect-ratio)
+
+export function CrystalGallery({ map, marked, onToggleCrystal, onShow }) {
+  const zoom = map.size / THUMB_WINDOW;
+  const base = import.meta.env.BASE_URL + map.image;
+  // Background-position % that centers map-space coordinate v in the thumb.
+  // The size % sets image width relative to thumb width, so the vertical
+  // scale relative to thumb height is larger by the aspect ratio. Near the
+  // map edge the position clamps, so the ring gets the residual offset
+  // (ring% equals 50 whenever the position didn't clamp).
+  const pos = (v, s) => clamp((100 * (0.5 - (v / map.size) * s)) / (1 - s), 0, 100);
+  const ringPos = (v, s, p) => `${(v / map.size) * s * 100 + (1 - s) * p}%`;
+  return (
+    <div className="ghc-grid">
+      {map.crystals.map((c) => {
+        const on = marked.has(c.id);
+        const px = pos(c.x, zoom);
+        const py = pos(c.y, zoom * THUMB_ASPECT);
+        return (
+          <div key={c.id} className={`ghc-card ${on ? "marked" : ""}`}>
+            <button
+              className="ghc-thumb"
+              style={{
+                backgroundImage: `url(${base})`,
+                backgroundSize: `${zoom * 100}%`,
+                backgroundPosition: `${px}% ${py}%`,
+              }}
+              title="Show on the big map"
+              aria-label={`Show crystal spot ${c.id} on the map`}
+              onClick={() => onShow(c)}
+            >
+              <span
+                className={`ghc-ring ${c.underground ? "under" : ""} ${on ? "marked" : ""}`}
+                style={{ left: ringPos(c.x, zoom, px), top: ringPos(c.y, zoom * THUMB_ASPECT, py) }}
+              />
+            </button>
+            <div className="ghc-body">
+              <div className="ghc-head">
+                <strong>#{c.id}</strong>
+                <span className={`badge ${c.underground ? "deep-badge" : "ok-badge"}`}>
+                  {c.underground ? "underground" : "surface"}
+                </span>
+              </div>
+              <p className="ghc-where">{c.where}</p>
+              <div className="ghc-actions">
+                <button className={`chip ${on ? "on" : ""}`} onClick={() => onToggleCrystal(c.id)}>
+                  {on ? "✦ resonated" : "mark resonated"}
+                </button>
+                <button className="chip" onClick={() => onShow(c)}>
+                  show on map
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 }

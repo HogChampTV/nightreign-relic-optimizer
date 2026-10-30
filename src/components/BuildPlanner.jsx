@@ -458,6 +458,11 @@ export default function BuildPlanner({ gd, relics, deepRelics, prefs, setPref, s
           );
         })}
         <EffectPicker gd={gd} nightfarer={nightfarer} excludeKeys={goalKeys} onPick={addGoal} inventoryKeys={inventoryKeys} />
+        <p className="muted goal-hint">
+          Tiered effects count upward automatically: a “Physical Attack Up +2” goal is also satisfied by +3 and
+          +4 copies — and higher tiers score more — so one goal at the lowest tier you'd accept already means
+          “the best version my relics allow”. Listing the tiers separately isn't double-counted.
+        </p>
 
         <div className="run-row">
           <button className="primary" disabled={searching || goals.length === 0} onClick={() => runSearch(goals, cursePenalty)}>

@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react";
 import { DAMAGE_TYPES, STATUS_TYPES, WEAKNESS_ROWS, RISE_GUIDE, SHIFTING_EARTH, GREAT_HOLLOW } from "../lib/guides-data.js";
-import GreatHollowMap from "./GreatHollowMap.jsx";
+import GreatHollowMap, { CrystalGallery } from "./GreatHollowMap.jsx";
 import { CURSE_TIERS } from "../lib/curse-tiers.js";
 import { effectNote } from "../lib/effect-notes.js";
 
@@ -150,8 +150,14 @@ function GreatHollow() {
   const [solo, setSolo] = useState(false);
   const [resonated, setResonated] = useState(0);
   const [marked, setMarked] = useState(() => new Set());
+  const [focus, setFocus] = useState(null);
+  const mapWrapRef = useRef(null);
   const needed = solo ? 3 : 4;
   const done = resonated >= needed;
+  const showSpot = (spot) => {
+    setFocus({ spot, nonce: Date.now() });
+    mapWrapRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+  };
   // Tapping a crystal spot on the map keeps the tracker in step; tapping the
   // pips directly still works for runs where you don't bother with the map.
   const toggleCrystal = (id) => {
@@ -175,8 +181,8 @@ function GreatHollow() {
       <p className="se-hazard">⚠ {GREAT_HOLLOW.curse}</p>
 
       <div className="gh-layout">
-        <div className="gh-map-wrap">
-          <GreatHollowMap map={GREAT_HOLLOW.map} marked={marked} onToggleCrystal={toggleCrystal} />
+        <div className="gh-map-wrap" ref={mapWrapRef}>
+          <GreatHollowMap map={GREAT_HOLLOW.map} marked={marked} onToggleCrystal={toggleCrystal} focus={focus} />
         </div>
 
         <div className="gh-side">
@@ -214,6 +220,14 @@ function GreatHollow() {
           </ul>
         </div>
       </div>
+
+      <h3>Crystal spots up close</h3>
+      <p className="muted">
+        Every possible Resonating Crystal spot with a close-up of where it sits. Spawns are per-run random — not
+        every spot is used — so treat this as the full checklist, not a promise. Tap a thumbnail to jump to the
+        spot on the big map, and mark spots as you resonate them: the tracker follows.
+      </p>
+      <CrystalGallery map={GREAT_HOLLOW.map} marked={marked} onToggleCrystal={toggleCrystal} onShow={showSpot} />
 
       <h3>Bosses</h3>
       <p className="muted">{GREAT_HOLLOW.bosses}</p>

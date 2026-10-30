@@ -436,6 +436,31 @@ label { display: flex; flex-direction: column; gap: 4px; font-size: 13px; color:
 .ghm-caption p { margin: 0; }
 .ghm-key-crystal { color: #49d6ff; }
 .ghm-credit { margin-top: 0; }
+
+/* Crystal spot gallery (CrystalGallery in GreatHollowMap.jsx) */
+.ghc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; margin: 12px 0; }
+.ghc-card {
+  display: flex; flex-direction: column; background: var(--bg-card);
+  border: 1px solid var(--border); border-radius: 10px; overflow: hidden;
+}
+.ghc-card.marked { border-color: #7fc77f; }
+.ghc-thumb {
+  position: relative; width: 100%; aspect-ratio: 2 / 1; border: none; cursor: zoom-in;
+  background-repeat: no-repeat; background-color: #17130f; padding: 0; display: block;
+}
+.ghc-ring {
+  position: absolute; left: 50%; top: 50%; width: 22px; height: 22px;
+  transform: translate(-50%, -50%); border-radius: 50%;
+  border: 2.5px solid #49d6ff; box-shadow: 0 0 6px rgba(73, 214, 255, 0.8), inset 0 0 6px rgba(73, 214, 255, 0.5);
+}
+.ghc-ring.under { border-color: #ffb14d; box-shadow: 0 0 6px rgba(255, 177, 77, 0.8), inset 0 0 6px rgba(255, 177, 77, 0.5); }
+.ghc-ring.marked { border-color: #7fc77f; box-shadow: 0 0 7px rgba(127, 199, 127, 0.9), inset 0 0 7px rgba(127, 199, 127, 0.6); }
+.ghc-body { display: flex; flex-direction: column; gap: 6px; padding: 9px 11px 11px; font-size: 12.5px; }
+.ghc-head { display: flex; align-items: center; gap: 8px; }
+.ghc-where { margin: 0; color: var(--text-dim); }
+.ghc-actions { display: flex; gap: 6px; flex-wrap: wrap; margin-top: auto; }
+
+.goal-hint { font-size: 12px; margin: 6px 0 0; }
 .gh-side { display: flex; flex-direction: column; gap: 10px; font-size: 13px; }
 .gh-side p, .gh-side ul { margin: 0; }
 .gh-tracker { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }

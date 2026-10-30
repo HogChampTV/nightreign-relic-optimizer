@@ -300,6 +300,10 @@ test("shifting earth guide entries are complete", async () => {
   assert.equal(map.crystals.length, 21, "the full datamined crystal-spot pool");
   assert.equal(map.crystals.filter((c) => c.underground).length, 6, "underground crystal spots");
   assert.equal(new Set(map.crystals.map((c) => c.id)).size, 21, "crystal ids unique");
+  for (const c of map.crystals) {
+    assert.ok(typeof c.where === "string" && c.where.length > 15, `crystal ${c.id} has a location note`);
+    assert.equal(c.where.startsWith("Underground:"), !!c.underground, `crystal ${c.id} note matches its layer`);
+  }
   assert.ok(map.pois.length >= 15, "seed-variable POI slots present");
   for (const p of [...map.landmarks, ...map.spawns, ...map.pois, ...map.crystals]) {
     assert.ok(p.x > 0 && p.x < map.size && p.y > 0 && p.y < map.size, "map point inside the map space");
