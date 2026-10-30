@@ -169,6 +169,30 @@ test("sell audit respects researched stacking and equip caps", () => {
   assert.equal(stackKeep.length, 1);
 });
 
+test("weakness table rows are well-formed and consistent with nightlords", async () => {
+  const { WEAKNESS_ROWS, DAMAGE_TYPES, STATUS_TYPES } = await import("../src/lib/guides-data.js");
+  const { NIGHTLORDS } = await import("../src/lib/nightlords.js");
+  const ids = new Set(NIGHTLORDS.map((n) => n.id));
+  assert.equal(WEAKNESS_ROWS.length, 10, "8 bosses incl. two Gnoster forms and two Heolstor phases");
+  for (const row of WEAKNESS_ROWS) {
+    assert.equal(row.dmg.length, DAMAGE_TYPES.length, `${row.boss}: one modifier per damage type`);
+    assert.equal(row.status.length, STATUS_TYPES.length, `${row.boss}: one threshold per status`);
+    assert.ok(ids.has(row.nightlordId), `${row.boss}: links to a real Nightlord entry`);
+    for (const v of row.status) assert.ok(v === null || [154, 252, 541].includes(v), `${row.boss}: known threshold`);
+  }
+  // Every Nightlord's counter research should agree with the table: its rows
+  // must contain at least one positive (bonus-damage) modifier or a low status
+  // threshold, except Adel whose counter is status-only.
+  for (const nl of NIGHTLORDS) {
+    const rows = WEAKNESS_ROWS.filter((r) => r.nightlordId === nl.id);
+    assert.ok(rows.length > 0, `${nl.id} appears in the table`);
+    assert.ok(
+      rows.some((r) => r.dmg.some((v) => v > 0) || r.status.some((v) => v === 154)),
+      `${nl.id} has an exploitable weakness in the table`,
+    );
+  }
+});
+
 test("stat totals parse the community value strings", async () => {
   const { loadoutTotals } = await import("../src/lib/stat-totals.js");
   const bySlug = new Map(gd.effectsByKey.filter(Boolean).map((e) => [e.slug, e]));

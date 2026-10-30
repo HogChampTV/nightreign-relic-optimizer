@@ -12,6 +12,7 @@ import RelicBrowser from "./components/RelicBrowser.jsx";
 import BuildPlanner from "./components/BuildPlanner.jsx";
 import SellAudit from "./components/SellAudit.jsx";
 import WhatsNew from "./components/WhatsNew.jsx";
+import Guides from "./components/Guides.jsx";
 import { auditSellables } from "./lib/sell-audit.js";
 
 const gd = createGameData(gameDataJson);
@@ -133,6 +134,9 @@ export default function App() {
             <button className={tab === "new" ? "active" : ""} onClick={() => setTab("new")}>
               What's New {prevCharacter && <span className="count">{newCount}</span>}
             </button>
+            <button className={tab === "guides" ? "active" : ""} onClick={() => setTab("guides")}>
+              Guides
+            </button>
           </nav>
           {tab === "relics" ? (
             <RelicBrowser character={character} />
@@ -140,6 +144,13 @@ export default function App() {
             <SellAudit gd={gd} character={character} />
           ) : tab === "new" ? (
             <WhatsNew character={character} prevCharacter={prevCharacter} />
+          ) : tab === "guides" ? (
+            <Guides
+              onTargetNightlord={(id) => {
+                setPref("nightlord", id);
+                setTab("builds");
+              }}
+            />
           ) : (
             <BuildPlanner gd={gd} relics={relics} deepRelics={deepRelics} prefs={prefs} setPref={setPref} />
           )}

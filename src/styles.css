@@ -378,3 +378,56 @@ label { display: flex; flex-direction: column; gap: 4px; font-size: 13px; color:
 .nl-goal.ok { border-color: #3f5a3f; }
 .nl-goal.swapped { border-color: #6a5a2f; }
 .nl-goal.missing { opacity: 0.55; text-decoration: line-through; }
+
+/* ---- Guides tab ---- */
+.guides { display: flex; flex-direction: column; gap: 28px; margin-top: 18px; }
+.guide-section h2 { color: var(--gold-bright); display: flex; align-items: center; gap: 12px; }
+.weakness-scroll { overflow-x: auto; border: 1px solid var(--border); border-radius: 10px; }
+.weakness-table { border-collapse: collapse; font-size: 13px; width: 100%; min-width: 980px; }
+.weakness-table th, .weakness-table td { padding: 7px 9px; text-align: center; border-bottom: 1px solid var(--border); white-space: nowrap; }
+.weakness-table th { background: var(--bg-raised); color: var(--text-dim); font-weight: 600; position: sticky; top: 0; }
+.weakness-table td:first-child, .weakness-table th:first-child { text-align: left; }
+.weakness-table td:nth-child(2), .weakness-table th:nth-child(2) { text-align: left; }
+.weakness-table tr:last-child td { border-bottom: none; }
+.weakness-table .status-col { border-left: 1px solid transparent; }
+.weakness-table th.status-col:first-of-type, .weakness-table td.status-col:first-of-type { border-left: 1px solid var(--border-light); }
+.dmg.good { color: #8fce8f; background: rgba(90, 160, 90, 0.10); font-weight: 600; }
+.dmg.bad { color: #d08c8c; background: rgba(170, 80, 80, 0.10); }
+.dmg.immune { color: #d08c8c; }
+.boss-link { font-size: 13px; }
+
+.rise-group h3 { margin: 14px 0 6px; color: var(--gold); }
+.rise-spots { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 8px; }
+.rise-spot {
+  display: flex; gap: 10px; align-items: flex-start; text-align: left;
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  padding: 10px 12px; cursor: pointer; color: var(--text); font: inherit;
+}
+.rise-spot.done { opacity: 0.45; }
+.rise-spot.done .rise-name { text-decoration: line-through; }
+.rise-check {
+  flex: none; width: 20px; height: 20px; margin-top: 1px; border-radius: 6px;
+  border: 1.5px solid var(--border-light); display: flex; align-items: center; justify-content: center;
+  color: var(--gold-bright); font-size: 13px;
+}
+.rise-spot.done .rise-check { border-color: var(--gold); background: #1d2a40; }
+.rise-name { display: block; font-weight: 600; font-size: 13.5px; }
+.rise-hint { display: block; font-size: 12.5px; margin-top: 2px; }
+
+/* ---- Loadout compare ---- */
+.pin-btn { margin-left: auto; }
+.pin-btn.on { border-color: var(--gold); color: var(--gold-bright); }
+.share-checklist { margin-left: 0; }
+.compare-panel {
+  background: var(--bg-card); border: 1px solid var(--gold); border-radius: 10px;
+  padding: 14px 16px; margin-bottom: 16px; overflow-x: auto;
+}
+.compare-panel h3 { margin: 0 0 10px; color: var(--gold-bright); }
+.compare-table { border-collapse: collapse; font-size: 13px; width: 100%; }
+.compare-table th, .compare-table td { padding: 5px 10px; text-align: center; border-bottom: 1px solid var(--border); }
+.compare-table th { color: var(--text-dim); }
+.compare-table .compare-label { text-align: left; color: var(--text-dim); max-width: 340px; }
+.compare-table td.better { color: #8fce8f; font-weight: 600; background: rgba(90, 160, 90, 0.08); }
+.compare-totals-row td { color: var(--gold-bright); }
+.compare-totals-row .compare-label { color: var(--text-dim); font-weight: 400; }
+.compare-relics { font-size: 12.5px; max-width: 260px; white-space: normal; }

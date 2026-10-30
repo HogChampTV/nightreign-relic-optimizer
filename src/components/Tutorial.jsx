@@ -14,7 +14,7 @@ const STEPS = [
           never touch the file — and helps you get the most out of your relics.
         </p>
         <p>
-          This quick tour walks through the four tabs. Reopen it anytime with the <strong>? Help</strong> button up
+          This quick tour walks through the tabs. Reopen it anytime with the <strong>? Help</strong> button up
           top.
         </p>
       </>
@@ -31,9 +31,9 @@ const STEPS = [
           search.
         </p>
         <p>
-          Each goal is an effect to hunt for; mark one <strong>need ≥</strong> to make it required.{" "}
-          <strong>Deep mode</strong> fills the three deep slots too. Hit <strong>Optimize</strong> to search every
-          vessel + relic combination — millions of combos in under a second.
+          Raiding a specific boss? Set a <strong>Target Nightlord</strong> and researched counter goals (their
+          weakness element, the right negation and resistances) are layered on automatically. Then hit{" "}
+          <strong>Find best loadouts</strong> to search every vessel + relic combination.
         </p>
       </>
     ),
@@ -44,13 +44,14 @@ const STEPS = [
     body: (
       <>
         <p>
-          Loadouts are ranked by score, with chips showing which goals each one met. The{" "}
-          <strong>vessel verdict</strong> strip names the best chalice (★) and how the others compare.
+          Loadouts are ranked by score, with goal chips, a <strong>vessel verdict</strong> strip (★ = best
+          chalice), and a <strong>Totals</strong> row summing the always-on numbers: damage multipliers,
+          negation, regen — so you can compare #1 and #2 by what they actually give you.
         </p>
         <p>
-          Every relic card says where to grab it in-game, e.g. <em>“Red filter · row 26, slot 1”</em>: on the
-          equip screen, set that color filter with sorting on <strong>Order Found</strong>, then count rows and
-          slots.
+          Every relic card says where to grab it in-game (<em>“Red filter · row 26, slot 1”</em> under Order
+          Found) — and the <strong>📱 Checklist</strong> button turns the whole loadout into a QR code your phone
+          can scan: a tap-off equip list, no save needed there.
         </p>
       </>
     ),
@@ -97,6 +98,19 @@ const STEPS = [
         <p>
           Each new relic is marked as an <strong>upgrade</strong> (outclasses relics you own), <strong>covered on
           arrival</strong> (instant sell fodder), or shown with the build presets it feeds.
+        </p>
+      </>
+    ),
+  },
+  {
+    title: "Guides",
+    tab: "guides",
+    body: (
+      <>
+        <p>
+          Mid-expedition reference: the full <strong>Nightlord weakness table</strong> (damage modifiers and
+          status thresholds — click a boss to target it in the optimizer) and a{" "}
+          <strong>Sorcerer's Rise unlock route</strong> with every known seal spot, tickable as you sweep them.
         </p>
       </>
     ),

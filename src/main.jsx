@@ -11,3 +11,10 @@ const cl = checklistFromHash();
 createRoot(document.getElementById("root")).render(
   cl ? <Checklist data={cl.data} id={cl.id} /> : <App />,
 );
+
+// Offline/installable support (production only; dev server stays uncached).
+if (import.meta.env.PROD && "serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register(`${import.meta.env.BASE_URL}sw.js`).catch(() => {});
+  });
+}

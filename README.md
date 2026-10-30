@@ -36,6 +36,14 @@ view of every relic you own, and finds the best vessel + relic loadouts for **De
   tap-off, phone-friendly checklist of the loadout (vessel, each relic's color-filter + row/slot
   location, effects). The whole build is encoded in the URL itself: nothing is uploaded, and the
   link works on any device with no save import.
+- **Guides tab**: the full Nightlord weakness table (per-type damage modifiers and status
+  buildup thresholds, click a boss to target it in the optimizer) and a Sorcerer's Rise unlock
+  route listing every known seal spot — including the Ruined Towers' exploding seals — tickable
+  as you sweep them.
+- **Guided tour**: a first-import walkthrough of every tab; reopen it anytime with the ? Help
+  button.
+- **Installable (PWA)**: works offline once visited and installs to desktop or phone — handy for
+  the checklist page mid-expedition.
 
 ## Run it
 

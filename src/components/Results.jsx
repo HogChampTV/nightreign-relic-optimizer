@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import RelicCard from "./RelicCard.jsx";
 import ShareChecklist from "./ShareChecklist.jsx";
 import { goalSatisfaction } from "../lib/preset-engine.js";
@@ -6,9 +6,85 @@ import { loadoutTotals } from "../lib/stat-totals.js";
 
 const SHOW_STEP = 5;
 
+// Side-by-side diff of two pinned loadouts: goals, totals, differing relics.
+function ComparePanel({ ranks, combinations, pool, deepPool, entries, vessels }) {
+  const sides = ranks.map((rank) => {
+    const combo = combinations[rank];
+    const relics = combo.idx6.map((idx, s) => (idx < 0 ? null : s < 3 ? pool[idx] : deepPool[idx]));
+    return { rank, combo, relics, sat: goalSatisfaction(entries, relics), totals: loadoutTotals(relics) };
+  });
+  const [a, b] = sides;
+  const sharedKeys = new Set(a.relics.filter(Boolean).map((r) => r.key));
+  const totalsByLabel = (side) => new Map(side.totals.chips.map((c) => [c.label, c.value]));
+  const ta = totalsByLabel(a);
+  const tb = totalsByLabel(b);
+  const totalLabels = [...new Set([...ta.keys(), ...tb.keys()])];
+  return (
+    <div className="compare-panel">
+      <h3>Comparing #{a.rank + 1} vs #{b.rank + 1}</h3>
+      <table className="compare-table">
+        <thead>
+          <tr>
+            <th></th>
+            {sides.map((s) => (
+              <th key={s.rank}>
+                #{s.rank + 1} · {vessels[s.combo.vessel]?.name} <span className="muted">({s.combo.points.toFixed(2)})</span>
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {a.sat.map((row, i) => {
+            const other = b.sat[i];
+            return (
+              <tr key={`g${i}`}>
+                <td className="compare-label">{row.effect.name}</td>
+                {[row, other].map((r, j) => (
+                  <td key={j} className={r.stacks > [row, other][1 - j].stacks ? "better" : ""}>
+                    {r.met ? "✓" : "·"} {r.stacks > 0 ? `×${r.stacks}` : "—"}
+                  </td>
+                ))}
+              </tr>
+            );
+          })}
+          {totalLabels.map((label) => (
+            <tr key={`t${label}`} className="compare-totals-row">
+              <td className="compare-label">{label}</td>
+              {[ta, tb].map((t, j) => (
+                <td key={j}>{t.get(label) ?? "—"}</td>
+              ))}
+            </tr>
+          ))}
+          <tr>
+            <td className="compare-label">Differing relics</td>
+            {sides.map((s, j) => (
+              <td key={j} className="compare-relics">
+                {s.relics
+                  .filter(Boolean)
+                  .filter((r) => (j === 0 ? !b.relics.some((o) => o?.key === r.key) : !sharedKeys.has(r.key)))
+                  .map((r) => r.name)
+                  .join(", ") || "— same —"}
+              </td>
+            ))}
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
 export default function Results({ results, gd, mode }) {
   const [shown, setShown] = useState(SHOW_STEP);
+  const [pinned, setPinned] = useState([]);
   const { combinations, pool, deepPool, entries, vessels, ms, checked } = results;
+
+  // New search results: old pins point at different loadouts, so drop them.
+  useEffect(() => setPinned([]), [results]);
+
+  const togglePin = (rank) =>
+    setPinned((prev) =>
+      prev.includes(rank) ? prev.filter((r) => r !== rank) : [...prev.slice(-1), rank],
+    );
 
   if (combinations.length === 0) {
     return (
@@ -60,6 +136,16 @@ export default function Results({ results, gd, mode }) {
           ))}
         </div>
       </div>
+      {pinned.length === 2 && (
+        <ComparePanel
+          ranks={[...pinned].sort((x, y) => x - y)}
+          combinations={combinations}
+          pool={pool}
+          deepPool={deepPool}
+          entries={entries}
+          vessels={vessels}
+        />
+      )}
       {combinations.slice(0, shown).map((combo, rank) => {
         const comboRelics = combo.idx6.map((idx, s) => (idx < 0 ? null : s < 3 ? pool[idx] : deepPool[idx]));
         const sat = goalSatisfaction(entries, comboRelics);
@@ -75,6 +161,13 @@ export default function Results({ results, gd, mode }) {
               <span className={`combo-met ${met === sat.length ? "all" : ""}`}>
                 {met}/{sat.length} goals met
               </span>
+              <button
+                className={`ghost small pin-btn ${pinned.includes(rank) ? "on" : ""}`}
+                title="Pin two loadouts to compare them side by side"
+                onClick={() => togglePin(rank)}
+              >
+                {pinned.includes(rank) ? "📌 Pinned" : "Pin to compare"}
+              </button>
               <ShareChecklist
                 vesselName={vessel?.name ?? "Loadout"}
                 score={combo.points.toFixed(1)}
