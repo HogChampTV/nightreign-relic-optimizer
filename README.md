@@ -1,0 +1,67 @@
+# Nightreign Relic Optimizer
+
+A local web app that reads your Elden Ring Nightreign save, gives you a fast filter/search
+view of every relic you own, and finds the best vessel + relic loadouts for **Deep of Night**
+(3 normal + 3 deep slots) or normal expeditions.
+
+- **Import**: drag your `NR0000.sl2` onto the page. It is decrypted and parsed entirely in the
+  browser (Web Crypto AES-CBC) — nothing is uploaded, and the save is only ever read.
+- **Relic Browser**: search by relic or effect name, filter by color and normal/deep, and flag
+  duplicate or outclassed relics you can safely sell.
+- **Build presets**: a researched **signature build for each of the ten Nightfarers** (shown
+  only for the selected character, sources cited on the card) plus nine universal Deep of Night
+  archetypes. Applying one checks your inventory first: effects you don't own are automatically
+  swapped for the closest fallback you do own, and the report tells you exactly what was
+  substituted. Community-consensus run-killing curses are rejected by default (toggleable),
+  and every effect shows its numeric value and curse tier on hover.
+- **Custom builds**: edit any preset's goals (min/max stacks, priority) or build from scratch
+  with the effect search, then save your builds locally.
+- **Sell Audit**: lists relics that are *provably* safe to sell — surplus identical copies beyond
+  what any vessel half can equip, and dead-weight relics whose every effect adds nothing next to
+  a better relic — using researched per-effect stacking data (`src/data/stacking.json`, from the
+  relics.pro compendium cross-checked against the community stacking sheets; regenerate with
+  `scripts/build-stacking.mjs`). Relics that merely look redundant but still stack are listed
+  separately, and every effect tooltip shows its stacking behavior.
+- **Optimizer**: scores every relic triple per vessel half across all enabled vessels
+  (multi-threaded via web workers) and returns the top 50 loadouts with per-goal satisfaction.
+
+## Run it
+
+```bash
+npm install
+npm run dev     # http://localhost:5190
+npm test        # parser + preset smoke tests
+npm run build   # static production build in dist/
+```
+
+`node scripts/inspect-save.mjs [path-to-save]` prints a read-only summary of a save from the CLI.
+
+`node scripts/audit-effects.mjs <path-to-save> [--write]` audits every preset effect against
+reality: the game's tables hold ~850 effect definitions, but only ~524 have ever been seen on an
+actual relic (checked against a 1,668-relic inventory, the community numbers sheet, and upstream's
+recommended lists). `--write` regenerates `src/data/obtainable-effects.json`, the whitelist that
+keeps datamined never-rolls effects out of presets and the effect search.
+
+## Where is my save?
+
+`%APPDATA%\Nightreign\<your Steam ID>\NR0000.sl2` (PC/Steam only).
+
+## Credits
+
+The save-format research, game data tables, and combo-search engine are MIT-licensed work from
+[metinc/nightreign-relic-browser](https://github.com/metinc/nightreign-relic-browser) and
+[tonydavis629/nightreign-relic-vault](https://github.com/tonydavis629/nightreign-relic-vault)
+(vendored in `src/engine/`, license in `src/engine/LICENSE-relic-vault.txt`). SL2 AES key credit: TKGP.
+
+Per-effect numeric values and notes (`src/data/effect-notes.json`, shown as tooltips) come from
+the community "Nightreign Useful Info" spreadsheet as distilled by
+[tijmen/nightreign-relic-optimizer](https://github.com/tijmen/nightreign-relic-optimizer) (MIT);
+regenerate with `node scripts/build-effect-notes.mjs <path-to-effect_ref.json>`.
+
+Per-effect stacking behavior (`src/data/stacking.json`) is researched from the
+[relics.pro compendium](https://relics.pro/compendium/) and cross-checked against COOKIE LIPS'
+"Nightreign Holy Bible" stacking spreadsheet and the Useful Info sheet; the few conflicts between
+sources are adjudicated in `scripts/build-stacking.mjs`.
+
+Game data targets relic-browser v1.0.30 tables; a game patch that adds effects will show them as
+"Unknown effect" until `src/data/game-data.json` is refreshed from upstream.
