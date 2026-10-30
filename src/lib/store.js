@@ -6,6 +6,7 @@ const SAVE_KEY = "nro.save.v1";
 const PREV_SAVE_KEY = "nro.save.prev.v1";
 const PREFS_KEY = "nro.prefs.v1";
 const BUILDS_KEY = "nro.customBuilds.v1";
+const TUTORIAL_KEY = "nro.tutorialSeen.v1";
 
 const read = (key) => {
   try {
@@ -39,3 +40,6 @@ export const persistPrefs = (prefs) => write(PREFS_KEY, prefs);
 
 export const loadCustomBuilds = () => read(BUILDS_KEY) ?? [];
 export const persistCustomBuilds = (builds) => write(BUILDS_KEY, builds);
+
+export const loadTutorialSeen = () => read(TUTORIAL_KEY) === true;
+export const persistTutorialSeen = () => write(TUTORIAL_KEY, true);

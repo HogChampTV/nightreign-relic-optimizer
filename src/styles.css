@@ -270,3 +270,42 @@ label { display: flex; flex-direction: column; gap: 4px; font-size: 13px; color:
   .control-row { gap: 10px; }
   .combo-slots { flex-direction: column; gap: 12px; }
 }
+
+/* ---- Guided tour ---- */
+.tutorial-card {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 50;
+  width: min(380px, calc(100vw - 32px));
+  background: var(--bg-card);
+  border: 1px solid var(--gold);
+  border-radius: 10px;
+  padding: 16px 18px 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(195, 168, 96, 0.15);
+}
+.tutorial-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.tutorial-head h3 { margin: 0 0 4px; color: var(--gold-bright); font-size: 16px; }
+.tutorial-body { font-size: 13.5px; line-height: 1.5; color: var(--text); }
+.tutorial-body p { margin: 8px 0; }
+.tutorial-body em { color: var(--text-dim); }
+.tutorial-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
+.tutorial-nav { display: flex; gap: 8px; }
+.tutorial-dots { display: flex; gap: 6px; justify-content: center; margin-top: 10px; }
+.tutorial-dots button {
+  width: 8px; height: 8px; padding: 0;
+  border-radius: 50%;
+  border: 1px solid var(--border-light);
+  background: transparent;
+}
+.tutorial-dots button.on { background: var(--gold); border-color: var(--gold); }
+
+/* While the tour is open, pulse the tab it is talking about. */
+.app.tutorial-open .tabs button.active {
+  animation: tutorial-pulse 1.6s ease-in-out infinite;
+  border-radius: 6px 6px 0 0;
+}
+@keyframes tutorial-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(233, 212, 144, 0); }
+  50% { box-shadow: 0 0 14px 2px rgba(233, 212, 144, 0.35); }
+}

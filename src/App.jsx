@@ -2,7 +2,11 @@ import React, { useEffect, useMemo, useState } from "react";
 import gameDataJson from "./data/game-data.json";
 import { createGameData } from "./engine/game-data.js";
 import { buildCharacter } from "./engine/model.js";
-import { loadSave, persistSave, clearSave, loadPrefs, persistPrefs, loadPrevSave, persistPrevSave } from "./lib/store.js";
+import {
+  loadSave, persistSave, clearSave, loadPrefs, persistPrefs, loadPrevSave, persistPrevSave,
+  loadTutorialSeen, persistTutorialSeen,
+} from "./lib/store.js";
+import Tutorial from "./components/Tutorial.jsx";
 import ImportPanel from "./components/ImportPanel.jsx";
 import RelicBrowser from "./components/RelicBrowser.jsx";
 import BuildPlanner from "./components/BuildPlanner.jsx";
@@ -18,6 +22,7 @@ export default function App() {
   const [prefs, setPrefs] = useState(() => loadPrefs());
   const [tab, setTab] = useState("builds");
   const [showImport, setShowImport] = useState(false);
+  const [showTutorial, setShowTutorial] = useState(false);
 
   const setPref = (k, v) => {
     setPrefs((p) => {
@@ -40,6 +45,16 @@ export default function App() {
   useEffect(() => {
     if (save && characters.length === 0) setShowImport(true);
   }, [save, characters.length]);
+
+  // First successful import: offer the tour once.
+  useEffect(() => {
+    if (character && !loadTutorialSeen()) setShowTutorial(true);
+  }, [character]);
+
+  const closeTutorial = () => {
+    persistTutorialSeen();
+    setShowTutorial(false);
+  };
 
   const onImported = (parsed) => {
     // Keep the outgoing save as the diff baseline, unless it's the same import.
@@ -74,7 +89,7 @@ export default function App() {
   }, [character, prevCharacter]);
 
   return (
-    <div className="app">
+    <div className={`app ${showTutorial ? "tutorial-open" : ""}`}>
       <header className="topbar">
         <div className="brand">
           <span className="brand-sigil">◆</span>
@@ -95,6 +110,9 @@ export default function App() {
                 </select>
               </label>
               <button className="ghost" onClick={() => setShowImport(true)}>Re-import save</button>
+              <button className="ghost help-btn" title="Show the guided tour" onClick={() => setShowTutorial(true)}>
+                ? Help
+              </button>
             </>
           )}
         </div>
@@ -125,6 +143,7 @@ export default function App() {
           ) : (
             <BuildPlanner gd={gd} relics={relics} deepRelics={deepRelics} prefs={prefs} setPref={setPref} />
           )}
+          <Tutorial open={showTutorial} onClose={closeTutorial} setTab={setTab} />
         </>
       )}
 
