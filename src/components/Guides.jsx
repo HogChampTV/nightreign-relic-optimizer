@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { DAMAGE_TYPES, STATUS_TYPES, WEAKNESS_ROWS, RISE_GUIDE, SHIFTING_EARTH } from "../lib/guides-data.js";
+import { DAMAGE_TYPES, STATUS_TYPES, WEAKNESS_ROWS, RISE_GUIDE, SHIFTING_EARTH, GREAT_HOLLOW } from "../lib/guides-data.js";
 import { CURSE_TIERS } from "../lib/curse-tiers.js";
 import { effectNote } from "../lib/effect-notes.js";
 
@@ -145,6 +145,145 @@ function ShiftingEarth() {
   );
 }
 
+// Schematic icons per landmark kind, drawn at the landmark's x/y.
+function LandmarkIcon({ lm }) {
+  switch (lm.kind) {
+    case "great-crystal":
+      return (
+        <g>
+          <path d={`M ${lm.x} ${lm.y - 16} L ${lm.x + 11} ${lm.y} L ${lm.x} ${lm.y + 16} L ${lm.x - 11} ${lm.y} Z`} className="gh-great-crystal" />
+          <path d={`M ${lm.x - 4} ${lm.y - 9} L ${lm.x + 5} ${lm.y + 7}`} className="gh-crack" />
+        </g>
+      );
+    case "castle":
+      return <path d={`M ${lm.x - 9} ${lm.y + 8} v -11 h 4 v -4 h 3 v 4 h 4 v -4 h 3 v 4 h 4 v 11 Z`} className="gh-castle" />;
+    case "tower":
+      return <path d={`M ${lm.x - 5} ${lm.y + 9} L ${lm.x - 3} ${lm.y - 10} h 6 L ${lm.x + 5} ${lm.y + 9} Z`} className="gh-tower" />;
+    case "altar":
+      return <circle cx={lm.x} cy={lm.y} r={6} className="gh-altar" />;
+    default:
+      return null;
+  }
+}
+
+function GreatHollow() {
+  const [solo, setSolo] = useState(false);
+  const [resonated, setResonated] = useState(0);
+  const needed = solo ? 3 : 4;
+  const done = resonated >= needed;
+  return (
+    <section className="guide-section">
+      <h2>
+        The Great Hollow <span className="badge deep-badge">DLC</span>
+      </h2>
+      <p className="muted">{GREAT_HOLLOW.blurb}</p>
+      <p className="se-hazard">⚠ {GREAT_HOLLOW.curse}</p>
+
+      <div className="gh-layout">
+        <div className="gh-map-wrap">
+          <svg viewBox="0 0 400 400" className="gh-map" role="img" aria-label="Schematic map of the Great Hollow">
+            <rect x="14" y="14" width="372" height="372" rx="46" className="gh-ground" />
+            {/* central chasm */}
+            <circle cx="200" cy="200" r="52" className="gh-chasm" />
+            <circle cx="200" cy="200" r="52" className="gh-chasm-edge" />
+            {/* western bridge toward the north tower */}
+            <path d="M 148 182 C 130 150, 150 110, 196 78" className="gh-bridge" />
+            {GREAT_HOLLOW.crystalSpots.map((c, i) => (
+              <g key={i} className="gh-spot">
+                <title>{c.hint} — spawns vary per run</title>
+                <circle cx={c.x} cy={c.y} r={11} className="gh-spot-ring" />
+                <path d={`M ${c.x} ${c.y - 5} L ${c.x + 4} ${c.y} L ${c.x} ${c.y + 5} L ${c.x - 4} ${c.y} Z`} className="gh-spot-gem" />
+              </g>
+            ))}
+            {GREAT_HOLLOW.landmarks.map((lm) => (
+              <g key={lm.label} className="gh-landmark">
+                <title>{`${lm.label} — ${lm.hint}`}</title>
+                <LandmarkIcon lm={lm} />
+                <text x={lm.x} y={lm.y + (lm.kind === "great-crystal" ? 30 : 22)} className="gh-label">
+                  {lm.label}
+                </text>
+              </g>
+            ))}
+          </svg>
+          <p className="muted gh-caption">
+            Schematic, not to scale. <span className="gh-legend-spot">◇</span> = common Resonating Crystal spots —
+            spawns are randomized per run, so not every spot is used; scan for the blue glow from a Spectral Hawk.
+          </p>
+        </div>
+
+        <div className="gh-side">
+          <div className="gh-tracker">
+            <h3>Resonance tracker</h3>
+            <div className="segmented">
+              <button className={!solo ? "on" : ""} onClick={() => { setSolo(false); setResonated(0); }}>Team (4)</button>
+              <button className={solo ? "on" : ""} onClick={() => { setSolo(true); setResonated(0); }}>Solo (3)</button>
+            </div>
+            <div className="gh-pips">
+              {Array.from({ length: needed }, (_, i) => (
+                <button
+                  key={i}
+                  className={`gh-pip ${i < resonated ? "done" : ""}`}
+                  title={`Resonating Crystal ${i + 1}`}
+                  onClick={() => setResonated(i < resonated ? i : i + 1)}
+                >
+                  {i < resonated ? "✦" : "◇"}
+                </button>
+              ))}
+            </div>
+            <p className={done ? "gh-done" : "muted"}>
+              {done
+                ? "The Great Crystal is open — everyone must touch it individually for the Favor."
+                : `${needed - resonated} more to crack the Great Crystal.`}
+            </p>
+          </div>
+          <p>
+            <span className="badge ok-badge">Reward</span> {GREAT_HOLLOW.reward}
+          </p>
+          <ul className="se-tips">
+            {GREAT_HOLLOW.mechanic.map((m, i) => (
+              <li key={i}>{m}</li>
+            ))}
+          </ul>
+        </div>
+      </div>
+
+      <h3>Bosses</h3>
+      <p className="muted">{GREAT_HOLLOW.bosses}</p>
+      <h3>Route</h3>
+      <ul className="se-tips">
+        {GREAT_HOLLOW.tips.map((t, i) => (
+          <li key={i}>{t}</li>
+        ))}
+      </ul>
+      <p className="se-hazard">⚠ {GREAT_HOLLOW.hazard}</p>
+
+      <h3>Getting it to appear</h3>
+      <ul className="se-tips">
+        {GREAT_HOLLOW.availability.map((a, i) => (
+          <li key={i}>{a}</li>
+        ))}
+      </ul>
+
+      <h3>Map seeds</h3>
+      {GREAT_HOLLOW.seeds.map((s, i) => (
+        <p key={i} className="muted">{s}</p>
+      ))}
+      <ul className="se-tips">
+        {GREAT_HOLLOW.tools.map((t) => (
+          <li key={t.name}>
+            <a href={t.url} target="_blank" rel="noreferrer">{t.name}</a> — {t.desc}.
+          </li>
+        ))}
+      </ul>
+      <p className="preset-research">
+        Researched from Fextralife's Great Hollow page, eldenring.wiki.gg, Game8, PC Gamer, Destructoid and
+        intoindiegames; pattern counts from nightreign-seed-finder.com and thefifthmatt's datamined tracker.
+        Crystal-count note: most guides say 4 to resonate (3 solo); one outlet reports ~8 spots spawn in total.
+      </p>
+    </section>
+  );
+}
+
 const CURSE_TIER_META = {
   never: { label: "Run-killing — never accept", cls: "bad" },
   painful: { label: "Painful but manageable", cls: "warn" },
@@ -189,6 +328,7 @@ function CurseGuide({ gd }) {
 
 const SECTIONS = [
   { id: "weakness", label: "Nightlord weaknesses" },
+  { id: "hollow", label: "Great Hollow (DLC)" },
   { id: "shifting", label: "Shifting Earth" },
   { id: "rise", label: "Sorcerer's Rise" },
   { id: "curses", label: "Curse tiers" },
@@ -207,6 +347,9 @@ export default function Guides({ gd, onTargetNightlord }) {
       </div>
       <div ref={(el) => (refs.current.weakness = el)}>
         <WeaknessTable onTarget={onTargetNightlord} />
+      </div>
+      <div ref={(el) => (refs.current.hollow = el)}>
+        <GreatHollow />
       </div>
       <div ref={(el) => (refs.current.shifting = el)}>
         <ShiftingEarth />

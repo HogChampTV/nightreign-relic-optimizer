@@ -280,6 +280,20 @@ test("shifting earth guide entries are complete", async () => {
     }
     assert.ok(Array.isArray(se.tips) && se.tips.length >= 2, `${se.name} has tips`);
   }
+
+  const { GREAT_HOLLOW } = await import("../src/lib/guides-data.js");
+  for (const field of ["name", "blurb", "curse", "reward", "bosses", "hazard"]) {
+    assert.ok(GREAT_HOLLOW[field]?.length > 5, `Great Hollow has ${field}`);
+  }
+  for (const list of ["mechanic", "tips", "availability", "seeds"]) {
+    assert.ok(GREAT_HOLLOW[list].length >= 2, `Great Hollow has ${list}`);
+  }
+  assert.equal(GREAT_HOLLOW.landmarks.filter((l) => l.kind === "great-crystal").length, 1);
+  assert.ok(GREAT_HOLLOW.crystalSpots.length >= 4, "enough common crystal spots to resonate");
+  for (const p of [...GREAT_HOLLOW.landmarks, ...GREAT_HOLLOW.crystalSpots]) {
+    assert.ok(p.x > 20 && p.x < 380 && p.y > 20 && p.y < 380, "map point inside the schematic");
+  }
+  for (const t of GREAT_HOLLOW.tools) assert.match(t.url, /^https:\/\//);
 });
 
 test("curse tiers cover every debuff effect, and only debuffs", () => {

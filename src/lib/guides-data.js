@@ -62,6 +62,68 @@ export const RISE_GUIDE = {
   credit: "Route distilled from community guides (seal-spot pool is fixed; which spots roll varies per expedition).",
 };
 
+// The Great Hollow: the Forsaken Hollows DLC's Shifting Earth. Unlike the four
+// base events it replaces ALL of Limveld with its own multi-layered map, built
+// around the Crystal Curse mechanic. Researched from Fextralife's Great Hollow
+// page, eldenring.wiki.gg, Game8, PC Gamer, Destructoid and intoindiegames
+// (cross-checked); seed facts from nightreign-seed-finder.com and
+// thefifthmatt's datamined pattern tracker.
+export const GREAT_HOLLOW = {
+  name: "The Great Hollow",
+  dlc: "The Forsaken Hollows",
+  blurb:
+    "The DLC's Shifting Earth takes over the entire map: Limveld is replaced by a vast sunken, multi-layered region of cliffs, chasms and ruins with its own POIs, enemies and bosses — built around one mechanic: the Crystal Curse.",
+  curse:
+    "Entering a major POI (the two cursed castles, forts, towers) halves your max HP until the curse is lifted. A bottomless central chasm is instant death. Avoid the castles until you're curse-proof.",
+  mechanic: [
+    "Dark-blue Resonating Crystals are scattered around the map — resonate with 4 of them (3 in solo expeditions). Each one cracks the Great Crystal at map centre a little more.",
+    "Crystal spawn spots are randomized per run and not every spot is used — check the common spots on the map below, and use a Spectral Hawk's overhead view to scan for the blue glow.",
+    "Once cracked open, touch the Great Crystal (red map flag, pinned by day 2) for the Favor — every party member must touch it individually. The broken crystal also becomes a teleport point.",
+  ],
+  reward:
+    "“Favor of the Great Hollow”: breaks the Crystal Curse (restoring full max HP), and once your Sacred Flasks are exhausted, your Art gauge charges faster.",
+  bosses:
+    "Night bosses come in duos (e.g. Curseblade + Divine Beast Warrior, Demon in Pain + Demon from Below); night 2 is fought at the north Divine Tower (Lord of Blood or Demon Prince). The Gaping Dragon headlines the field bosses, and an Elder Inquisitor guards the weapon-duplication altar. The two Divine Towers are boss-rushes that grant a False Vision of a Great Rune (faster Ult charge, bonus murk).",
+  tips: [
+    "Day 1: clear the Kaiden Mercenaries at spawn, hit 2–3 churches, and resonate every crystal you can — all needed crystals are usually findable on day 1. Stay out of the castles.",
+    "Day 2: grab the Favor first thing, then farm the NW/SE castles for purple/legendary gear, and take the western bridge to the north Divine Tower (safer than jumping from the east/south).",
+    "Aim for ~level 6–7 by night 1 and ~12 before the underground forts; use fort waygates and the Great Crystal teleport to cross the map.",
+  ],
+  hazard:
+    "Crystal Curse (−50% max HP in POIs), the bottomless central chasm, and cursed dungeons stacking poison / flame / frost / rot. There are no Evergaols here.",
+  availability: [
+    "Requires the Forsaken Hollows DLC for everyone in the lobby — non-owners never see it.",
+    "Unlocks after beating two Nightlords (including Tricephalos) with the DLC installed; enter via the chapel behind the Small Jar Merchant at the Roundtable.",
+    "Like other Shifting Earths it rolls randomly after completed expeditions; the Collector Signboard (post-Everdark, 1 Sovereign Sigil) can force an unlocked event. Fextralife reports it can also roll in Deep of Night queues for DLC owners since patch 1.03.1.",
+  ],
+  seeds: [
+    "Limveld layouts aren't fully random: the community datamined a fixed pattern pool. The DLC grew it from 320 to 520 patterns, 80 of which are Great Hollow layouts — far more variants than the 5-per-event the base Shifting Earths get, which is why runs feel so different.",
+    "You can identify your seed from day-1 landmark positions (churches, Rises, forts) and plan the route ahead with the community seed tools below.",
+  ],
+  tools: [
+    { name: "Nightreign Seed Finder", url: "https://nightreign-seed-finder.com", desc: "interactive recognizer covering all 520 patterns, Great Hollow included" },
+    { name: "thefifthmatt's pattern tracker", url: "https://thefifthmatt.github.io/nightreign", desc: "the datamined pattern list, per Nightlord" },
+  ],
+  // Schematic landmark positions for the inline map (0–400 viewBox, not to
+  // scale). Crystal spots are the commonly-reported spawn areas, not fixed.
+  landmarks: [
+    { x: 200, y: 200, kind: "great-crystal", label: "Great Crystal", hint: "Resonate 4 crystals (3 solo) to crack it open — then touch it for the Favor. Becomes a teleport point." },
+    { x: 118, y: 118, kind: "castle", label: "Cursed castle (NW)", hint: "Crystal Curse inside: −50% max HP until the Favor. Day-2 loot run." },
+    { x: 282, y: 282, kind: "castle", label: "Cursed castle (SE)", hint: "Crystal Curse inside: −50% max HP until the Favor. Day-2 loot run." },
+    { x: 212, y: 62, kind: "tower", label: "North Divine Tower", hint: "Night 2 is fought here; approach over the western bridge. Boss-rush grants a False Vision of a Great Rune." },
+    { x: 330, y: 240, kind: "tower", label: "Divine Tower", hint: "Boss-rush: False Vision of a Great Rune (faster Ult charge, bonus murk)." },
+    { x: 148, y: 252, kind: "altar", label: "Duplication altar", hint: "Guarded by an Elder Inquisitor — duplicate your best weapon for a teammate." },
+  ],
+  crystalSpots: [
+    { x: 150, y: 340, hint: "Common spot: southern edge (west)" },
+    { x: 252, y: 346, hint: "Common spot: southern edge (east)" },
+    { x: 86, y: 206, hint: "Common spot: western mid-map ring" },
+    { x: 316, y: 158, hint: "Common spot: eastern mid-map ring" },
+    { x: 162, y: 108, hint: "Common spot: northern mid-map ring" },
+    { x: 296, y: 86, hint: "Common spot: north-eastern ring" },
+  ],
+};
+
 // Shifting Earth events: what each map takeover gives you and whether it's
 // worth the detour. Researched from the wiki.gg Nightreign Shifting Earth page
 // and Game8's per-event guides (cross-checked; Fextralife for names/affinities).

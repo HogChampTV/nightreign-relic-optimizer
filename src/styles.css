@@ -385,6 +385,38 @@ label { display: flex; flex-direction: column; gap: 4px; font-size: 13px; color:
 .se-tips li { margin: 3px 0; }
 .se-hazard { color: #d9a05b; font-size: 12px; }
 
+/* ---- Guides: Great Hollow ---- */
+.gh-layout { display: grid; grid-template-columns: minmax(280px, 460px) 1fr; gap: 18px; align-items: start; margin: 12px 0; }
+@media (max-width: 860px) { .gh-layout { grid-template-columns: 1fr; } }
+.gh-map { width: 100%; height: auto; display: block; }
+.gh-ground { fill: #10151f; stroke: var(--border-light); stroke-width: 1.5; }
+.gh-chasm { fill: #05070b; }
+.gh-chasm-edge { fill: none; stroke: #2a3347; stroke-width: 1.5; stroke-dasharray: 4 3; }
+.gh-bridge { fill: none; stroke: #3a4458; stroke-width: 3; stroke-dasharray: 6 4; }
+.gh-great-crystal { fill: #7b6cd9; stroke: #b7aef0; stroke-width: 1.5; }
+.gh-crack { stroke: #0a0d14; stroke-width: 1.5; fill: none; }
+.gh-castle { fill: #4a4132; stroke: #c3a860; stroke-width: 1; }
+.gh-tower { fill: #39415a; stroke: #93a1c7; stroke-width: 1; }
+.gh-altar { fill: #2e4a3a; stroke: #7fc77f; stroke-width: 1.2; }
+.gh-spot-ring { fill: rgba(96, 170, 220, 0.08); stroke: #5aa7d6; stroke-width: 1.2; stroke-dasharray: 3 3; }
+.gh-spot-gem { fill: #5aa7d6; }
+.gh-spot:hover .gh-spot-ring { stroke-width: 2; fill: rgba(96, 170, 220, 0.2); }
+.gh-landmark:hover { cursor: help; }
+.gh-label { fill: #aab3c7; font-size: 10.5px; text-anchor: middle; paint-order: stroke; stroke: #0a0d14; stroke-width: 3px; }
+.gh-caption { font-size: 12px; margin-top: 6px; }
+.gh-legend-spot { color: #5aa7d6; }
+.gh-side { display: flex; flex-direction: column; gap: 10px; font-size: 13px; }
+.gh-side p, .gh-side ul { margin: 0; }
+.gh-tracker { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+.gh-tracker h3 { margin: 0; font-size: 14px; }
+.gh-pips { display: flex; gap: 8px; }
+.gh-pip {
+  width: 40px; height: 40px; border-radius: 10px; font-size: 18px; cursor: pointer;
+  background: none; border: 1px dashed var(--border-light); color: #5aa7d6;
+}
+.gh-pip.done { border: 1px solid #7b6cd9; background: rgba(123, 108, 217, 0.15); color: #b7aef0; }
+.gh-done { color: #7fc77f; font-weight: 600; margin: 0; }
+
 /* ---- Guides: curse tiers ---- */
 .curse-group { margin-top: 14px; }
 .curse-tier { margin: 0 0 8px; font-size: 14px; }

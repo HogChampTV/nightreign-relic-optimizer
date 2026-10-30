@@ -45,10 +45,11 @@ view of every relic you own, and finds the best vessel + relic loadouts for **De
   every card, a filter shows only wishlisted relics, and What's New calls out fresh imports
   that contain one so you don't sell it by accident.
 - **Guides tab**: the full Nightlord weakness table (per-type damage modifiers and status
-  buildup thresholds, click a boss to target it in the optimizer), all four Shifting Earth
-  events with their rewards and routing tips, a Sorcerer's Rise unlock route listing every
-  known seal spot — including the Ruined Towers' exploding seals — tickable as you sweep them,
-  and every Deep relic curse ranked by community tier.
+  buildup thresholds, click a boss to target it in the optimizer), a Great Hollow (DLC) guide
+  with a schematic crystal map, a tap-off Resonating Crystal tracker and map-seed pointers,
+  all four base Shifting Earth events with their rewards and routing tips, a Sorcerer's Rise
+  unlock route listing every known seal spot — including the Ruined Towers' exploding seals —
+  tickable as you sweep them, and every Deep relic curse ranked by community tier.
 - **Guided tour**: a first-import walkthrough of every tab; reopen it anytime with the ? Help
   button.
 - **Installable (PWA)**: works offline once visited and installs to desktop or phone — handy for
