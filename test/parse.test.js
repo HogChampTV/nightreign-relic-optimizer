@@ -76,6 +76,26 @@ test("every preset effect is obtainable (seen on real relics), not datamined-onl
   }
 });
 
+test("every Nightlord counter goal exists and is obtainable", async () => {
+  const { NIGHTLORDS } = await import("../src/lib/nightlords.js");
+  const obtainable = JSON.parse(
+    await readFile(new URL("../src/data/obtainable-effects.json", import.meta.url), "utf8"),
+  );
+  const keys = new Set(obtainable.keys);
+  const bySlug = new Map(gd.effectsByKey.filter(Boolean).map((e) => [e.slug, e]));
+  assert.equal(NIGHTLORDS.length, 8, "all eight Nightlords covered");
+  for (const nl of NIGHTLORDS) {
+    assert.ok(nl.goals.length > 0 && nl.warn && nl.research, `${nl.id} has goals, warning and research`);
+    for (const goal of nl.goals) {
+      for (const slug of [goal.slug, ...(goal.alternatives ?? [])]) {
+        const effect = bySlug.get(slug);
+        assert.ok(effect, `${nl.id}: unknown slug ${slug}`);
+        assert.ok(keys.has(effect.key), `${nl.id}: ${slug} never rolls on relics`);
+      }
+    }
+  }
+});
+
 test("sell audit respects researched stacking and equip caps", () => {
   const stacking = gd.effectsByKey.find((e) => e && selfStacks(e) && e.type !== 1);
   const nonStacking = gd.effectsByKey.find((e) => e && !selfStacks(e) && e.type !== 1 && e.level === undefined);
@@ -147,6 +167,46 @@ test("sell audit respects researched stacking and equip caps", () => {
   ({ safe, stackKeep } = auditSellables(gd, [betterW, worseW]));
   assert.equal(safe.length, 0);
   assert.equal(stackKeep.length, 1);
+});
+
+test("stat totals parse the community value strings", async () => {
+  const { loadoutTotals } = await import("../src/lib/stat-totals.js");
+  const bySlug = new Map(gd.effectsByKey.filter(Boolean).map((e) => [e.slug, e]));
+  const relic = (...slugs) => ({ effects: slugs.map((s) => [bySlug.get(s)]) });
+  const out = loadoutTotals([
+    relic("physicalAttackUp", "physicalAttackUpPlus1"), // 1.04 × 1.05 (self-stacks)
+    relic("magicDamageNegationUp", "improvedCriticalHits"),
+    relic("continuousHpRecovery"),
+  ]);
+  const chip = (label) => out.chips.find((c) => c.label === label);
+  assert.ok(Math.abs(parseFloat(chip("Phys").value.slice(1)) - 1.04 * 1.05) < 1e-6, "phys multipliers multiply");
+  assert.equal(chip("Elem neg").value, "10%", "equal elemental negations collapse into one chip");
+  assert.equal(chip("HP regen").value, "2/s");
+  assert.ok(out.counted >= 4 && out.total === 5, "counted/total tracked");
+});
+
+test("checklist share links round-trip", async () => {
+  const { encodeChecklist, decodeChecklist, buildChecklistPayload } = await import("../src/lib/share.js");
+  const payload = buildChecklistPayload({
+    vesselName: "Wylder’s Chalice",
+    score: "13.1",
+    isDeep: true,
+    relics: [
+      {
+        name: "Grand Scène Lumineuse ✦",
+        color: 1,
+        isDeep: false,
+        coordinatesByColor: [25, 0],
+        effects: [[{ name: "Physical Attack Up", type: 0 }, { name: "Reduced Vigor", type: 1 }]],
+      },
+      null,
+    ],
+  });
+  const decoded = decodeChecklist(encodeChecklist(payload));
+  assert.deepEqual(decoded, payload, "unicode-safe round trip");
+  assert.equal(decoded.r[0].l[0], 26, "locations are 1-based");
+  assert.ok(decoded.r[0].e[1].startsWith("✦"), "curses are marked");
+  assert.equal(decodeChecklist("not-base64!!"), null, "garbage decodes to null, not a crash");
 });
 
 test("curse tiers cover every debuff effect, and only debuffs", () => {

@@ -10,10 +10,12 @@ import GapReport from "./GapReport.jsx";
 import { effectTooltip } from "../lib/effect-notes.js";
 import { RUN_KILLER_SLUGS } from "../lib/curse-tiers.js";
 import { COLOR_NAMES } from "../engine/game-data.js";
+import { NIGHTLORDS, nightlordById } from "../lib/nightlords.js";
 
 export default function BuildPlanner({ gd, relics, deepRelics, prefs, setPref }) {
   const nightfarer = prefs.nightfarer ?? 0;
   const mode = prefs.mode ?? "deep";
+  const targetNightlordId = prefs.nightlord ?? "";
   const [goals, setGoals] = useState([]);
   const [activePresetId, setActivePresetId] = useState(null);
   const [report, setReport] = useState(null);
@@ -47,6 +49,15 @@ export default function BuildPlanner({ gd, relics, deepRelics, prefs, setPref })
     return keys;
   }, [relics, deepRelics]);
 
+  // Counter goals for the chosen target Nightlord, resolved against the
+  // inventory with the same fallback machinery presets use. Merged into every
+  // search on top of whatever preset/custom goals are active.
+  const nightlord = nightlordById(targetNightlordId);
+  const nightlordRes = useMemo(() => {
+    if (!nightlord) return null;
+    return resolvePreset({ goals: nightlord.goals }, gd, relics, deepRelics, mode, nightfarer);
+  }, [nightlord, gd, relics, deepRelics, mode, nightfarer]);
+
   const runSearch = useCallback(
     async (goalRows, penalty) => {
       const rows = goalRows.filter((g) => gd.effectByKey(g.effectKey));
@@ -61,6 +72,19 @@ export default function BuildPlanner({ gd, relics, deepRelics, prefs, setPref })
           maxStacks: g.max,
           weight: PRIORITY_WEIGHTS[g.priority] ?? 1,
         }));
+        // Layer the target-Nightlord counter goals on top (goal rows win on overlap).
+        const extraEntries = [];
+        for (const e of nightlordRes?.entries ?? []) {
+          if (rows.some((r) => r.effectKey === e.effect.key)) continue;
+          selectedEffects.push(e.effect);
+          selectedEntries.push({
+            effectKey: e.effect.key,
+            minStacks: e.minStacks,
+            maxStacks: e.maxStacks,
+            weight: PRIORITY_WEIGHTS[e.priority] ?? 1,
+          });
+          extraEntries.push(e);
+        }
         if (banRunKillers) {
           // Exclude builds carrying community-consensus run-killing curses.
           const present = new Set(selectedEntries.map((e) => e.effectKey));
@@ -81,11 +105,14 @@ export default function BuildPlanner({ gd, relics, deepRelics, prefs, setPref })
           cursePenalty: CURSE_PENALTIES[penalty] ?? 0,
         });
         const res = await searchCombos(input);
-        const entries = rows.map((g) => ({
-          effect: gd.effectByKey(g.effectKey),
-          minStacks: g.min,
-          maxStacks: g.max,
-        }));
+        const entries = [
+          ...rows.map((g) => ({
+            effect: gd.effectByKey(g.effectKey),
+            minStacks: g.min,
+            maxStacks: g.max,
+          })),
+          ...extraEntries.map((e) => ({ effect: e.effect, minStacks: e.minStacks, maxStacks: e.maxStacks })),
+        ];
         setResults({ ...res, pool, deepPool, entries, vessels: enabledVessels });
       } catch (err) {
         if (!(err instanceof SearchCancelled)) setError(String(err?.message ?? err));
@@ -93,7 +120,7 @@ export default function BuildPlanner({ gd, relics, deepRelics, prefs, setPref })
         setSearching(false);
       }
     },
-    [gd, nightfarer, relics, modeDeepRelics, enabledVessels, banRunKillers],
+    [gd, nightfarer, relics, modeDeepRelics, enabledVessels, banRunKillers, nightlordRes],
   );
 
   const applyPreset = useCallback(
@@ -121,6 +148,12 @@ export default function BuildPlanner({ gd, relics, deepRelics, prefs, setPref })
     if (preset) applyPreset(preset);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode, nightfarer, relics, deepRelics]);
+
+  // Changing the target Nightlord re-ranks existing results with its counter goals.
+  useEffect(() => {
+    if (goals.length > 0 && results) runSearch(goals, cursePenalty);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [targetNightlordId]);
 
   const editGoal = (i, patch) => {
     setGoals((g) => g.map((row, j) => (i === j ? { ...row, ...patch } : row)));
@@ -192,6 +225,17 @@ export default function BuildPlanner({ gd, relics, deepRelics, prefs, setPref })
             </div>
           </label>
           <label>
+            Target Nightlord
+            <select value={targetNightlordId} onChange={(e) => setPref("nightlord", e.target.value)}>
+              <option value="">Any — no counter goals</option>
+              {NIGHTLORDS.map((n) => (
+                <option key={n.id} value={n.id}>
+                  {n.name} ({n.expedition})
+                </option>
+              ))}
+            </select>
+          </label>
+          <label>
             Curse penalty
             <select value={cursePenalty} onChange={(e) => setCursePenalty(e.target.value)}>
               <option value="none">None — curses are fine</option>
@@ -210,6 +254,39 @@ export default function BuildPlanner({ gd, relics, deepRelics, prefs, setPref })
             Vessels ({enabledVessels.length}/{allVessels.length}) {showVessels ? "▴" : "▾"}
           </button>
         </div>
+
+        {nightlord && (
+          <div className="nightlord-card">
+            <div className="nightlord-head">
+              <strong>{nightlord.name}</strong> <span className="muted">· {nightlord.expedition}</span>
+            </div>
+            <p className="nightlord-blurb">{nightlord.blurb}</p>
+            <p className="muted">{nightlord.warn}</p>
+            {nightlordRes && (
+              <div className="nightlord-goals">
+                <span className="muted">Counter goals added:</span>
+                {nightlordRes.report.map((r, i) => (
+                  <span
+                    key={i}
+                    className={`chip nl-goal ${r.status}`}
+                    title={
+                      (r.goal.note ? `${r.goal.note}. ` : "") +
+                      (r.status === "swapped"
+                        ? `You don't own ${r.effect?.name}; using ${r.replacedBy?.name} instead.`
+                        : r.status === "missing"
+                          ? `You don't own ${r.effect?.name ?? r.goal.slug} or any fallback — goal skipped.`
+                          : `Owned ×${r.owned}.`)
+                    }
+                  >
+                    {r.status === "missing" ? "✕ " : r.status === "swapped" ? "≈ " : "✓ "}
+                    {(r.status === "swapped" ? r.replacedBy?.name : r.effect?.name) ?? r.goal.slug}
+                  </span>
+                ))}
+              </div>
+            )}
+            <p className="preset-research">Research: {nightlord.research}</p>
+          </div>
+        )}
 
         {showVessels && (
           <div className="vessel-list">

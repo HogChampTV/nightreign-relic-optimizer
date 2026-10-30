@@ -24,6 +24,18 @@ view of every relic you own, and finds the best vessel + relic loadouts for **De
   separately, and every effect tooltip shows its stacking behavior.
 - **Optimizer**: scores every relic triple per vessel half across all enabled vessels
   (multi-threaded via web workers) and returns the top 50 loadouts with per-goal satisfaction.
+- **Target Nightlord**: pick the boss you're raiding and researched counter goals (their
+  elemental weakness, the negation for what they deal, resistance against what they inflict)
+  are layered on top of any preset — `src/lib/nightlords.js`, grounded in the Fextralife and
+  wiki.gg negation/status tables, cross-checked against Game8 and the community weakness chart,
+  with per-boss source notes and a warning card (what NOT to bring, e.g. fire into Gladius).
+- **Stat totals** on every result: always-on effect values (damage multipliers, negation,
+  max HP/FP, attributes, regen) parsed from the community numbers and summed per loadout —
+  situational buffs are counted but never folded in, and non-stacking duplicates count once.
+- **Equip checklist links**: every result has a 📱 Checklist button — a QR/link that opens a
+  tap-off, phone-friendly checklist of the loadout (vessel, each relic's color-filter + row/slot
+  location, effects). The whole build is encoded in the URL itself: nothing is uploaded, and the
+  link works on any device with no save import.
 
 ## Run it
 

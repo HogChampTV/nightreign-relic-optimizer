@@ -1,6 +1,6 @@
 // Numeric values and mechanical notes per effect, from the community
 // "Nightreign Useful Info" sheet (via tijmen/nightreign-relic-optimizer, MIT).
-import notes from "../data/effect-notes.json";
+import notes from "../data/effect-notes.json" with { type: "json" };
 import { curseTier, TIER_LABELS } from "./curse-tiers.js";
 import { stackingLabel } from "./stacking.js";
 

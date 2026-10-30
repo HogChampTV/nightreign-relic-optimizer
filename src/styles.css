@@ -309,3 +309,72 @@ label { display: flex; flex-direction: column; gap: 4px; font-size: 13px; color:
   0%, 100% { box-shadow: 0 0 0 0 rgba(233, 212, 144, 0); }
   50% { box-shadow: 0 0 14px 2px rgba(233, 212, 144, 0.35); }
 }
+
+/* ---- Loadout stat totals ---- */
+.combo-totals { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 6px 0 2px; }
+.totals-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; cursor: help; }
+.total-chip {
+  font-size: 12px; padding: 2px 8px; border-radius: 10px;
+  background: #1d2a40; border: 1px solid var(--border-light); color: var(--text-dim);
+}
+.total-chip strong { color: var(--gold-bright); font-weight: 600; }
+.total-note { font-size: 12px; }
+
+/* ---- Checklist share ---- */
+.share-checklist { position: relative; margin-left: auto; }
+.combo-head { flex-wrap: wrap; }
+.share-pop {
+  position: absolute; right: 0; top: calc(100% + 6px); z-index: 40;
+  display: flex; flex-direction: column; gap: 8px; width: 220px;
+  background: var(--bg-card); border: 1px solid var(--gold); border-radius: 10px;
+  padding: 12px; font-size: 12px; box-shadow: 0 8px 28px rgba(0,0,0,0.6);
+}
+.share-pop img { border-radius: 6px; align-self: center; }
+.share-actions { display: flex; gap: 8px; }
+.share-actions .open-link { text-decoration: none; padding: 4px 9px; border: 1px solid var(--border-light); border-radius: 6px; color: var(--text-dim); }
+.share-actions .open-link:hover { color: var(--text); }
+
+/* ---- Standalone equip checklist (phone-first) ---- */
+.checklist-page { max-width: 640px; margin: 0 auto; padding: 0 16px; }
+.checklist-head h2 { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; color: var(--gold-bright); }
+.checklist-items { display: flex; flex-direction: column; gap: 10px; margin-top: 14px; }
+.checklist-item {
+  display: flex; gap: 14px; align-items: flex-start; text-align: left;
+  background: var(--bg-card); border: 1px solid var(--border); border-left: 4px solid var(--border-light);
+  border-radius: 10px; padding: 14px; cursor: pointer; width: 100%;
+  color: var(--text); font: inherit;
+}
+.checklist-item.color-red { border-left-color: #c66a5a; }
+.checklist-item.color-blue { border-left-color: #6b9fd4; }
+.checklist-item.color-yellow { border-left-color: #cfc06a; }
+.checklist-item.color-green { border-left-color: #7eb47e; }
+.checklist-item.deep { background: #171527; }
+.checklist-item.done { opacity: 0.45; }
+.checklist-item.done .checklist-name { text-decoration: line-through; }
+.checklist-box {
+  flex: none; width: 28px; height: 28px; border-radius: 8px; margin-top: 2px;
+  border: 2px solid var(--border-light); display: flex; align-items: center; justify-content: center;
+  color: var(--gold-bright); font-size: 18px;
+}
+.checklist-item.done .checklist-box { background: #1d2a40; border-color: var(--gold); }
+.checklist-main { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.checklist-slot { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; }
+.checklist-name { font-weight: 600; display: flex; align-items: center; gap: 7px; }
+.checklist-loc { color: var(--gold); font-size: 14px; }
+.checklist-effects { font-size: 12.5px; line-height: 1.45; }
+.checklist-done-msg { text-align: center; color: var(--gold-bright); margin: 18px 0; }
+
+/* ---- Target Nightlord card ---- */
+.nightlord-card {
+  margin-top: 12px; padding: 12px 16px;
+  background: var(--bg-card); border: 1px solid var(--border-light); border-left: 4px solid var(--curse);
+  border-radius: 10px; font-size: 13.5px;
+}
+.nightlord-head { color: var(--gold-bright); }
+.nightlord-blurb { margin: 6px 0 2px; }
+.nightlord-card p { margin: 4px 0; }
+.nightlord-goals { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 8px 0 4px; }
+.nl-goal { font-size: 12px; cursor: help; }
+.nl-goal.ok { border-color: #3f5a3f; }
+.nl-goal.swapped { border-color: #6a5a2f; }
+.nl-goal.missing { opacity: 0.55; text-decoration: line-through; }

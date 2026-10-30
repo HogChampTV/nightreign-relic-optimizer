@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import RelicCard from "./RelicCard.jsx";
+import ShareChecklist from "./ShareChecklist.jsx";
 import { goalSatisfaction } from "../lib/preset-engine.js";
+import { loadoutTotals } from "../lib/stat-totals.js";
 
 const SHOW_STEP = 5;
 
@@ -63,6 +65,7 @@ export default function Results({ results, gd, mode }) {
         const sat = goalSatisfaction(entries, comboRelics);
         const met = sat.filter((s) => s.met).length;
         const vessel = vessels[combo.vessel];
+        const totals = loadoutTotals(comboRelics);
         return (
           <div key={rank} className="combo">
             <div className="combo-head">
@@ -72,7 +75,31 @@ export default function Results({ results, gd, mode }) {
               <span className={`combo-met ${met === sat.length ? "all" : ""}`}>
                 {met}/{sat.length} goals met
               </span>
+              <ShareChecklist
+                vesselName={vessel?.name ?? "Loadout"}
+                score={combo.points.toFixed(1)}
+                isDeep={mode === "deep"}
+                relics={comboRelics}
+              />
             </div>
+            {totals.chips.length > 0 && (
+              <div className="combo-totals">
+                <span
+                  className="totals-label muted"
+                  title="Always-on effects with parseable community values, summed. Situational buffs (on-kill, timed, conditional) are not folded in. Non-stacking duplicate effects count once."
+                >
+                  Totals
+                </span>
+                {totals.chips.map((c) => (
+                  <span key={c.label} className="total-chip" title={c.title}>
+                    {c.label} <strong>{c.value}</strong>
+                  </span>
+                ))}
+                {totals.situational > 0 && (
+                  <span className="muted total-note">+{totals.situational} situational</span>
+                )}
+              </div>
+            )}
             <div className="combo-goals">
               {sat.map((s, i) => (
                 <span key={i} className={`goal-chip ${s.met ? "met" : "unmet"}`} title={`${s.stacks} stack${s.stacks === 1 ? "" : "s"} in this loadout`}>
