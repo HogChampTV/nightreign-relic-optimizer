@@ -117,7 +117,8 @@ const STEPS = [
       <>
         <p>
           Mid-expedition reference: the full <strong>Nightlord weakness table</strong> (click a boss to target
-          it in the optimizer), a <strong>Great Hollow</strong> guide with a crystal map and resonance tracker,
+          it in the optimizer), a <strong>Great Hollow</strong> guide with an interactive map (the real in-game
+          map — pan/zoom, all 21 crystal spots, tap them as you resonate) and tracker,
           every <strong>Shifting Earth</strong> event's reward and route, a tickable{" "}
           <strong>Sorcerer's Rise unlock route</strong>, and all Deep relic <strong>curses ranked by tier</strong>.
         </p>

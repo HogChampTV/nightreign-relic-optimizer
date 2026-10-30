@@ -77,7 +77,7 @@ export const GREAT_HOLLOW = {
     "Entering a major POI (the two cursed castles, forts, towers) halves your max HP until the curse is lifted. A bottomless central chasm is instant death. Avoid the castles until you're curse-proof.",
   mechanic: [
     "Dark-blue Resonating Crystals are scattered around the map — resonate with 4 of them (3 in solo expeditions). Each one cracks the Great Crystal at map centre a little more.",
-    "Crystal spawn spots are randomized per run and not every spot is used — check the common spots on the map below, and use a Spectral Hawk's overhead view to scan for the blue glow.",
+    "Crystal spawns are per-run random — not seeded, so no tool can predict them. The map below marks all 21 possible spots (6 of them underground); not every spot is used, so scan for the blue glow from a Spectral Hawk's overhead view.",
     "Once cracked open, touch the Great Crystal (red map flag, pinned by day 2) for the Favor — every party member must touch it individually. The broken crystal also becomes a teleport point.",
   ],
   reward:
@@ -104,24 +104,80 @@ export const GREAT_HOLLOW = {
     { name: "Nightreign Seed Finder", url: "https://nightreign-seed-finder.com", desc: "interactive recognizer covering all 520 patterns, Great Hollow included" },
     { name: "thefifthmatt's pattern tracker", url: "https://thefifthmatt.github.io/nightreign", desc: "the datamined pattern list, per Nightlord" },
   ],
-  // Schematic landmark positions for the inline map (0–400 viewBox, not to
-  // scale). Crystal spots are the commonly-reported spawn areas, not fixed.
-  landmarks: [
-    { x: 200, y: 200, kind: "great-crystal", label: "Great Crystal", hint: "Resonate 4 crystals (3 solo) to crack it open — then touch it for the Favor. Becomes a teleport point." },
-    { x: 118, y: 118, kind: "castle", label: "Cursed castle (NW)", hint: "Crystal Curse inside: −50% max HP until the Favor. Day-2 loot run." },
-    { x: 282, y: 282, kind: "castle", label: "Cursed castle (SE)", hint: "Crystal Curse inside: −50% max HP until the Favor. Day-2 loot run." },
-    { x: 212, y: 62, kind: "tower", label: "North Divine Tower", hint: "Night 2 is fought here; approach over the western bridge. Boss-rush grants a False Vision of a Great Rune." },
-    { x: 330, y: 240, kind: "tower", label: "Divine Tower", hint: "Boss-rush: False Vision of a Great Rune (faster Ult charge, bonus murk)." },
-    { x: 148, y: 252, kind: "altar", label: "Duplication altar", hint: "Guarded by an Elder Inquisitor — duplicate your best weapon for a teammate." },
-  ],
-  crystalSpots: [
-    { x: 150, y: 340, hint: "Common spot: southern edge (west)" },
-    { x: 252, y: 346, hint: "Common spot: southern edge (east)" },
-    { x: 86, y: 206, hint: "Common spot: western mid-map ring" },
-    { x: 316, y: 158, hint: "Common spot: eastern mid-map ring" },
-    { x: 162, y: 108, hint: "Common spot: northern mid-map ring" },
-    { x: 296, y: 86, hint: "Common spot: north-eastern ring" },
-  ],
+  // Interactive map data. Coordinates are in the 1000×1000 space the
+  // Nightreign Seed Finder project publishes for its Great Hollow overlay
+  // (slot/crystal tables from its app, datamined foundations by thefifthmatt),
+  // and land pixel-exact on the in-game map image. The lower-right landmass on
+  // the image is the game's own inset for the underground cave network.
+  map: {
+    image: "guides/great-hollow-map.webp",
+    size: 1000,
+    credit:
+      "Location data from the Nightreign Seed Finder project (datamined foundations by thefifthmatt). Map art from Elden Ring Nightreign © FromSoftware / Bandai Namco, shown for identification in this fan guide.",
+    // Fixed geography — identical in all 80 Great Hollow seeds.
+    landmarks: [
+      { x: 347, y: 312, kind: "castle", label: "Western Underground Fort", hint: "Cursed POI — the Crystal Curse halves max HP inside until you hold the Favor. Elemental theme varies by seed (magic or fire). Prime day-2 loot run." },
+      { x: 641, y: 655, kind: "castle", label: "Eastern Underground Fort", hint: "Cursed POI — the Crystal Curse halves max HP inside until you hold the Favor. Elemental theme varies by seed (holy or rot). Prime day-2 loot run." },
+      { x: 579, y: 322, kind: "tower", label: "North Divine Tower", hint: "Boss-rush; grants a False Vision of a Great Rune (faster Ult charge, bonus murk). Night 2 is fought at a Divine Tower — approach over the western bridge." },
+      { x: 260, y: 423, kind: "tower", label: "West Divine Tower", hint: "Boss-rush; grants a False Vision of a Great Rune (faster Ult charge, bonus murk)." },
+      { x: 534, y: 592, kind: "great-crystal", label: "The Great Crystal", hint: "Resonate 4 crystals (3 solo) to crack it open, then touch it for the Favor — every party member individually. Becomes a teleport point. The chasm around it is a bottomless fall." },
+      { x: 417, y: 234, kind: "church", label: "Church (fixed)", hint: "Drawn into the game's own map — this church is here in every seed. Guaranteed Sacred Flask stop." },
+      { x: 543, y: 433, kind: "church", label: "Church (fixed)", hint: "Drawn into the game's own map — this church is here in every seed. Guaranteed Sacred Flask stop." },
+      { x: 802, y: 745, kind: "underground", label: "The Underground (inset)", hint: "This corner of the map is the game's inset for the cave network beneath the Hollow. Crystal spots marked ↓ are down here." },
+    ],
+    // The three possible drop-in points (which one you get varies by seed).
+    spawns: [
+      { x: 733, y: 347, label: "Spawn (northeast)" },
+      { x: 280, y: 683, label: "Spawn (southwest)" },
+      { x: 453, y: 779, label: "Spawn (south)" },
+    ],
+    // Seed-variable POI slots: the buildings are always at these spots, but
+    // what each one is (or whether the merchant shows at all) depends on the
+    // seed — identify yours with the tools below to know.
+    pois: [
+      { x: 770, y: 414, kind: "greatchurch", label: "Great Church", hint: "Elemental theme varies by seed (lightning or sleep)." },
+      { x: 685, y: 931, kind: "greatchurch", label: "Great Church (underground)", hint: "In the underground inset. Elemental theme varies by seed (frost or holy)." },
+      { x: 612, y: 512, kind: "church-or-rise", label: "Church or Sorcerer's Rise", hint: "Every seed puts 2 churches and 1–2 Sorcerer's Rises on these four spots — which is which varies." },
+      { x: 353, y: 525, kind: "church-or-rise", label: "Church or Sorcerer's Rise", hint: "Every seed puts 2 churches and 1–2 Sorcerer's Rises on these four spots — which is which varies." },
+      { x: 361, y: 773, kind: "church-or-rise", label: "Church or Sorcerer's Rise", hint: "Every seed puts 2 churches and 1–2 Sorcerer's Rises on these four spots — which is which varies." },
+      { x: 921, y: 806, kind: "church-or-rise", label: "Church or Sorcerer's Rise (underground)", hint: "In the underground inset. Every seed puts 2 churches and 1–2 Sorcerer's Rises on these four spots — which is which varies." },
+      { x: 253, y: 579, kind: "ruins", label: "Ruins", hint: "Status-themed ruins; the status varies by seed (poison or bleed)." },
+      { x: 881, y: 898, kind: "ruins", label: "Ruins (underground)", hint: "In the underground inset. Status varies by seed (sleep or magic)." },
+      { x: 397, y: 390, kind: "merchant", label: "Possible Scale-Bearing Merchant", hint: "Only ~1 in 3 seeds has the merchant at all, at exactly one of these seven spots." },
+      { x: 723, y: 475, kind: "merchant", label: "Possible Scale-Bearing Merchant", hint: "Only ~1 in 3 seeds has the merchant at all, at exactly one of these seven spots." },
+      { x: 436, y: 551, kind: "merchant", label: "Possible Scale-Bearing Merchant", hint: "Only ~1 in 3 seeds has the merchant at all, at exactly one of these seven spots." },
+      { x: 319, y: 636, kind: "merchant", label: "Possible Scale-Bearing Merchant", hint: "Only ~1 in 3 seeds has the merchant at all, at exactly one of these seven spots." },
+      { x: 362, y: 741, kind: "merchant", label: "Possible Scale-Bearing Merchant", hint: "Only ~1 in 3 seeds has the merchant at all, at exactly one of these seven spots." },
+      { x: 893, y: 816, kind: "merchant", label: "Possible Scale-Bearing Merchant (underground)", hint: "In the underground inset. Only ~1 in 3 seeds has the merchant at all, at exactly one of these seven spots." },
+      { x: 811, y: 908, kind: "merchant", label: "Possible Scale-Bearing Merchant (underground)", hint: "In the underground inset. Only ~1 in 3 seeds has the merchant at all, at exactly one of these seven spots." },
+    ],
+    // All 21 possible Resonating Crystal spots. Which ones are used is
+    // per-run random (NOT seeded — confirmed by thefifthmatt's datamining),
+    // so these are the complete pool to check, not a per-seed answer.
+    crystals: [
+      { id: 1, x: 451, y: 326 },
+      { id: 2, x: 705, y: 348 },
+      { id: 3, x: 531, y: 439 },
+      { id: 4, x: 370, y: 449 },
+      { id: 5, x: 639, y: 471 },
+      { id: 6, x: 727, y: 472 },
+      { id: 7, x: 418, y: 480 },
+      { id: 8, x: 265, y: 482 },
+      { id: 9, x: 453, y: 580 },
+      { id: 10, x: 294, y: 591 },
+      { id: 11, x: 237, y: 613 },
+      { id: 12, x: 401, y: 613 },
+      { id: 13, x: 512, y: 667 },
+      { id: 14, x: 357, y: 749 },
+      { id: 15, x: 419, y: 793 },
+      { id: 16, x: 882.5, y: 756.1, underground: true },
+      { id: 17, x: 832.5, y: 814.9, underground: true },
+      { id: 18, x: 913.1, y: 837.5, underground: true },
+      { id: 19, x: 800.9, y: 871.1, underground: true },
+      { id: 20, x: 911.9, y: 925.5, underground: true },
+      { id: 21, x: 806.9, y: 926.1, underground: true },
+    ],
+  },
 };
 
 // Shifting Earth events: what each map takeover gives you and whether it's

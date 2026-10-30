@@ -83,7 +83,8 @@ label { display: flex; flex-direction: column; gap: 4px; font-size: 13px; color:
 .segmented button.on { background: #1d2a40; color: var(--gold-bright); }
 
 /* ---- tabs ---- */
-.tabs { display: flex; gap: 6px; margin-top: 16px; border-bottom: 1px solid var(--border); }
+.tabs { display: flex; gap: 6px; margin-top: 16px; border-bottom: 1px solid var(--border); overflow-x: auto; scrollbar-width: thin; }
+.tabs button { flex-shrink: 0; }
 .tabs button {
   background: transparent; border: none; border-bottom: 2px solid transparent; border-radius: 0;
   color: var(--text-dim); font-size: 16px; padding: 10px 18px; font-family: Georgia, serif;
@@ -386,25 +387,55 @@ label { display: flex; flex-direction: column; gap: 4px; font-size: 13px; color:
 .se-hazard { color: #d9a05b; font-size: 12px; }
 
 /* ---- Guides: Great Hollow ---- */
-.gh-layout { display: grid; grid-template-columns: minmax(280px, 460px) 1fr; gap: 18px; align-items: start; margin: 12px 0; }
+.gh-layout { display: grid; grid-template-columns: minmax(300px, 560px) 1fr; gap: 18px; align-items: start; margin: 12px 0; }
 @media (max-width: 860px) { .gh-layout { grid-template-columns: 1fr; } }
-.gh-map { width: 100%; height: auto; display: block; }
-.gh-ground { fill: #10151f; stroke: var(--border-light); stroke-width: 1.5; }
-.gh-chasm { fill: #05070b; }
-.gh-chasm-edge { fill: none; stroke: #2a3347; stroke-width: 1.5; stroke-dasharray: 4 3; }
-.gh-bridge { fill: none; stroke: #3a4458; stroke-width: 3; stroke-dasharray: 6 4; }
-.gh-great-crystal { fill: #7b6cd9; stroke: #b7aef0; stroke-width: 1.5; }
-.gh-crack { stroke: #0a0d14; stroke-width: 1.5; fill: none; }
-.gh-castle { fill: #4a4132; stroke: #c3a860; stroke-width: 1; }
-.gh-tower { fill: #39415a; stroke: #93a1c7; stroke-width: 1; }
-.gh-altar { fill: #2e4a3a; stroke: #7fc77f; stroke-width: 1.2; }
-.gh-spot-ring { fill: rgba(96, 170, 220, 0.08); stroke: #5aa7d6; stroke-width: 1.2; stroke-dasharray: 3 3; }
-.gh-spot-gem { fill: #5aa7d6; }
-.gh-spot:hover .gh-spot-ring { stroke-width: 2; fill: rgba(96, 170, 220, 0.2); }
-.gh-landmark:hover { cursor: help; }
-.gh-label { fill: #aab3c7; font-size: 10.5px; text-anchor: middle; paint-order: stroke; stroke: #0a0d14; stroke-width: 3px; }
-.gh-caption { font-size: 12px; margin-top: 6px; }
-.gh-legend-spot { color: #5aa7d6; }
+/* Interactive Great Hollow map (GreatHollowMap.jsx) */
+.ghm { display: flex; flex-direction: column; gap: 8px; }
+.ghm-toolbar { display: flex; flex-wrap: wrap; gap: 6px; }
+.ghm-viewport {
+  position: relative; overflow: hidden; aspect-ratio: 1 / 1; width: 100%;
+  border: 1px solid var(--border-light); border-radius: 10px; background: #17130f;
+  touch-action: none; cursor: grab; user-select: none;
+}
+.ghm-viewport:active { cursor: grabbing; }
+.ghm-world { position: absolute; inset: 0; transform-origin: 0 0; }
+.ghm-image { width: 100%; height: 100%; display: block; pointer-events: none; }
+.ghm-marker {
+  position: absolute; background: none; border: none; padding: 0; cursor: pointer;
+  transform: translate(-50%, -50%) scale(var(--ghm-inv, 1));
+  display: flex; flex-direction: column; align-items: center; line-height: 1;
+}
+.ghm-crystal { font-size: 15px; color: #49d6ff; text-shadow: 0 0 4px #000, 0 0 8px rgba(73, 214, 255, 0.7); }
+.ghm-crystal.under { color: #ffb14d; text-shadow: 0 0 4px #000, 0 0 8px rgba(255, 177, 77, 0.7); }
+.ghm-crystal.marked { color: #7fc77f; text-shadow: 0 0 4px #000, 0 0 9px rgba(127, 199, 127, 0.9); }
+.ghm-crystal .ghm-under-mark { font-size: 10px; margin-top: -2px; }
+.ghm-crystal.sel .ghm-gem, .ghm-marker.sel { filter: brightness(1.4); }
+.ghm-spawn { font-size: 13px; color: #e8e2d0; text-shadow: 0 0 4px #000, 0 0 6px rgba(232, 226, 208, 0.8); }
+.ghm-poi { width: 11px; height: 11px; border-radius: 50%; border: 1.5px solid #0a0d14; box-shadow: 0 0 5px rgba(0, 0, 0, 0.8); }
+.ghm-poi-greatchurch { background: #e3c06a; }
+.ghm-poi-church-or-rise { background: #9fd1ff; }
+.ghm-poi-ruins { background: #b78bd9; }
+.ghm-poi-merchant { background: #8fbf6f; }
+.ghm-lm { width: 10px; height: 10px; }
+.ghm-lm::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: #e8e2d0; border: 1.5px solid #0a0d14; }
+.ghm-lm-great-crystal::before { width: 13px; height: 13px; background: #a88ef0; border-radius: 3px; transform: rotate(45deg); }
+.ghm-lm-castle::before { background: #e0b35c; }
+.ghm-lm-tower::before { background: #93a1c7; }
+.ghm-lm-church::before { background: transparent; border: 1.5px dashed #e3c06a; width: 14px; height: 14px; }
+.ghm-lm-underground::before { background: transparent; border: 1.5px dashed #ffb14d; width: 14px; height: 14px; }
+.ghm-label {
+  position: absolute; top: 100%; margin-top: 3px; white-space: nowrap; font-size: 10.5px; color: #e8e2d0;
+  text-shadow: 0 0 3px #000, 0 0 3px #000, 0 1px 2px #000; pointer-events: none;
+}
+.ghm-zoom { position: absolute; right: 8px; top: 8px; display: flex; flex-direction: column; gap: 4px; }
+.ghm-zoom button {
+  width: 30px; height: 30px; border-radius: 8px; border: 1px solid var(--border-light);
+  background: rgba(10, 13, 20, 0.85); color: var(--text); font-size: 16px; cursor: pointer;
+}
+.ghm-caption { font-size: 12.5px; min-height: 2.4em; }
+.ghm-caption p { margin: 0; }
+.ghm-key-crystal { color: #49d6ff; }
+.ghm-credit { margin-top: 0; }
 .gh-side { display: flex; flex-direction: column; gap: 10px; font-size: 13px; }
 .gh-side p, .gh-side ul { margin: 0; }
 .gh-tracker { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }

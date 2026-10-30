@@ -46,7 +46,10 @@ view of every relic you own, and finds the best vessel + relic loadouts for **De
   that contain one so you don't sell it by accident.
 - **Guides tab**: the full Nightlord weakness table (per-type damage modifiers and status
   buildup thresholds, click a boss to target it in the optimizer), a Great Hollow (DLC) guide
-  with a schematic crystal map, a tap-off Resonating Crystal tracker and map-seed pointers,
+  with an interactive map — the real in-game map with pan/zoom, every datamined Resonating
+  Crystal spot (surface and underground), fixed landmarks, spawns and seed-variable POIs
+  (location data from the Nightreign Seed Finder project / thefifthmatt) — a tap-off crystal
+  tracker wired to the map, and map-seed pointers,
   all four base Shifting Earth events with their rewards and routing tips, a Sorcerer's Rise
   unlock route listing every known seal spot — including the Ruined Towers' exploding seals —
   tickable as you sweep them, and every Deep relic curse ranked by community tier.
@@ -92,6 +95,13 @@ Per-effect stacking behavior (`src/data/stacking.json`) is researched from the
 [relics.pro compendium](https://relics.pro/compendium/) and cross-checked against COOKIE LIPS'
 "Nightreign Holy Bible" stacking spreadsheet and the Useful Info sheet; the few conflicts between
 sources are adjudicated in `scripts/build-stacking.mjs`.
+
+The Great Hollow guide's map image and marker coordinates (`public/guides/great-hollow-map.webp`,
+`GREAT_HOLLOW.map` in `src/lib/guides-data.js`) come from the
+[Nightreign Seed Finder](https://nightreign-seed-finder.com) project, which builds on game data
+extracted and shared by [thefifthmatt](https://thefifthmatt.github.io/nightreign). The map art
+itself is from Elden Ring Nightreign © FromSoftware / Bandai Namco, reproduced here for
+identification purposes in a non-commercial fan guide.
 
 Game data targets relic-browser v1.0.30 tables; a game patch that adds effects will show them as
 "Unknown effect" until `src/data/game-data.json` is refreshed from upstream.

@@ -1,5 +1,6 @@
 import React, { useRef, useState } from "react";
 import { DAMAGE_TYPES, STATUS_TYPES, WEAKNESS_ROWS, RISE_GUIDE, SHIFTING_EARTH, GREAT_HOLLOW } from "../lib/guides-data.js";
+import GreatHollowMap from "./GreatHollowMap.jsx";
 import { CURSE_TIERS } from "../lib/curse-tiers.js";
 import { effectNote } from "../lib/effect-notes.js";
 
@@ -145,32 +146,26 @@ function ShiftingEarth() {
   );
 }
 
-// Schematic icons per landmark kind, drawn at the landmark's x/y.
-function LandmarkIcon({ lm }) {
-  switch (lm.kind) {
-    case "great-crystal":
-      return (
-        <g>
-          <path d={`M ${lm.x} ${lm.y - 16} L ${lm.x + 11} ${lm.y} L ${lm.x} ${lm.y + 16} L ${lm.x - 11} ${lm.y} Z`} className="gh-great-crystal" />
-          <path d={`M ${lm.x - 4} ${lm.y - 9} L ${lm.x + 5} ${lm.y + 7}`} className="gh-crack" />
-        </g>
-      );
-    case "castle":
-      return <path d={`M ${lm.x - 9} ${lm.y + 8} v -11 h 4 v -4 h 3 v 4 h 4 v -4 h 3 v 4 h 4 v 11 Z`} className="gh-castle" />;
-    case "tower":
-      return <path d={`M ${lm.x - 5} ${lm.y + 9} L ${lm.x - 3} ${lm.y - 10} h 6 L ${lm.x + 5} ${lm.y + 9} Z`} className="gh-tower" />;
-    case "altar":
-      return <circle cx={lm.x} cy={lm.y} r={6} className="gh-altar" />;
-    default:
-      return null;
-  }
-}
-
 function GreatHollow() {
   const [solo, setSolo] = useState(false);
   const [resonated, setResonated] = useState(0);
+  const [marked, setMarked] = useState(() => new Set());
   const needed = solo ? 3 : 4;
   const done = resonated >= needed;
+  // Tapping a crystal spot on the map keeps the tracker in step; tapping the
+  // pips directly still works for runs where you don't bother with the map.
+  const toggleCrystal = (id) => {
+    setMarked((prev) => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      setResonated(Math.min(next.size, needed));
+      return next;
+    });
+  };
+  const resetRun = () => {
+    setResonated(0);
+    setMarked(new Set());
+  };
   return (
     <section className="guide-section">
       <h2>
@@ -181,42 +176,15 @@ function GreatHollow() {
 
       <div className="gh-layout">
         <div className="gh-map-wrap">
-          <svg viewBox="0 0 400 400" className="gh-map" role="img" aria-label="Schematic map of the Great Hollow">
-            <rect x="14" y="14" width="372" height="372" rx="46" className="gh-ground" />
-            {/* central chasm */}
-            <circle cx="200" cy="200" r="52" className="gh-chasm" />
-            <circle cx="200" cy="200" r="52" className="gh-chasm-edge" />
-            {/* western bridge toward the north tower */}
-            <path d="M 148 182 C 130 150, 150 110, 196 78" className="gh-bridge" />
-            {GREAT_HOLLOW.crystalSpots.map((c, i) => (
-              <g key={i} className="gh-spot">
-                <title>{c.hint} — spawns vary per run</title>
-                <circle cx={c.x} cy={c.y} r={11} className="gh-spot-ring" />
-                <path d={`M ${c.x} ${c.y - 5} L ${c.x + 4} ${c.y} L ${c.x} ${c.y + 5} L ${c.x - 4} ${c.y} Z`} className="gh-spot-gem" />
-              </g>
-            ))}
-            {GREAT_HOLLOW.landmarks.map((lm) => (
-              <g key={lm.label} className="gh-landmark">
-                <title>{`${lm.label} — ${lm.hint}`}</title>
-                <LandmarkIcon lm={lm} />
-                <text x={lm.x} y={lm.y + (lm.kind === "great-crystal" ? 30 : 22)} className="gh-label">
-                  {lm.label}
-                </text>
-              </g>
-            ))}
-          </svg>
-          <p className="muted gh-caption">
-            Schematic, not to scale. <span className="gh-legend-spot">◇</span> = common Resonating Crystal spots —
-            spawns are randomized per run, so not every spot is used; scan for the blue glow from a Spectral Hawk.
-          </p>
+          <GreatHollowMap map={GREAT_HOLLOW.map} marked={marked} onToggleCrystal={toggleCrystal} />
         </div>
 
         <div className="gh-side">
           <div className="gh-tracker">
             <h3>Resonance tracker</h3>
             <div className="segmented">
-              <button className={!solo ? "on" : ""} onClick={() => { setSolo(false); setResonated(0); }}>Team (4)</button>
-              <button className={solo ? "on" : ""} onClick={() => { setSolo(true); setResonated(0); }}>Solo (3)</button>
+              <button className={!solo ? "on" : ""} onClick={() => { setSolo(false); resetRun(); }}>Team (4)</button>
+              <button className={solo ? "on" : ""} onClick={() => { setSolo(true); resetRun(); }}>Solo (3)</button>
             </div>
             <div className="gh-pips">
               {Array.from({ length: needed }, (_, i) => (
@@ -278,7 +246,8 @@ function GreatHollow() {
       <p className="preset-research">
         Researched from Fextralife's Great Hollow page, eldenring.wiki.gg, Game8, PC Gamer, Destructoid and
         intoindiegames; pattern counts from nightreign-seed-finder.com and thefifthmatt's datamined tracker.
-        Crystal-count note: most guides say 4 to resonate (3 solo); one outlet reports ~8 spots spawn in total.
+        Crystal-count note: resonate 4 (3 solo) from a pool of 21 possible spots — which spots spawn each run
+        is random, not seeded (confirmed by thefifthmatt's datamining).
       </p>
     </section>
   );

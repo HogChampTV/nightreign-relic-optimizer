@@ -3,6 +3,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
+import fs from "node:fs";
 import { parseSave } from "../src/engine/save-parser.js";
 import { createGameData } from "../src/engine/game-data.js";
 import { buildCharacter } from "../src/engine/model.js";
@@ -288,10 +289,20 @@ test("shifting earth guide entries are complete", async () => {
   for (const list of ["mechanic", "tips", "availability", "seeds"]) {
     assert.ok(GREAT_HOLLOW[list].length >= 2, `Great Hollow has ${list}`);
   }
-  assert.equal(GREAT_HOLLOW.landmarks.filter((l) => l.kind === "great-crystal").length, 1);
-  assert.ok(GREAT_HOLLOW.crystalSpots.length >= 4, "enough common crystal spots to resonate");
-  for (const p of [...GREAT_HOLLOW.landmarks, ...GREAT_HOLLOW.crystalSpots]) {
-    assert.ok(p.x > 20 && p.x < 380 && p.y > 20 && p.y < 380, "map point inside the schematic");
+  const map = GREAT_HOLLOW.map;
+  assert.ok(map.image.endsWith(".webp"), "map image is the vendored webp");
+  assert.ok(fs.existsSync(new URL(`../public/${map.image}`, import.meta.url)), "map image file exists");
+  assert.ok(map.credit.length > 20, "map credits its sources");
+  assert.equal(map.landmarks.filter((l) => l.kind === "great-crystal").length, 1);
+  assert.equal(map.landmarks.filter((l) => l.kind === "castle").length, 2, "both underground forts");
+  assert.equal(map.landmarks.filter((l) => l.kind === "tower").length, 2, "both divine towers");
+  assert.equal(map.spawns.length, 3, "all three spawn points");
+  assert.equal(map.crystals.length, 21, "the full datamined crystal-spot pool");
+  assert.equal(map.crystals.filter((c) => c.underground).length, 6, "underground crystal spots");
+  assert.equal(new Set(map.crystals.map((c) => c.id)).size, 21, "crystal ids unique");
+  assert.ok(map.pois.length >= 15, "seed-variable POI slots present");
+  for (const p of [...map.landmarks, ...map.spawns, ...map.pois, ...map.crystals]) {
+    assert.ok(p.x > 0 && p.x < map.size && p.y > 0 && p.y < map.size, "map point inside the map space");
   }
   for (const t of GREAT_HOLLOW.tools) assert.match(t.url, /^https:\/\//);
 });
